@@ -14,4 +14,6 @@ Le projet a pour objectif de présenter l'établissement, sa carte et ses évén
 
 ## État du projet
 
-La phase de conception est terminée. Le développement de l'application débute par la réalisation du Front-End.
+La phase de conception est terminée et le développement du Front-End a commencé.
+
+L'application React a été initialisée avec Vite en JavaScript. L'environnement Front-End est installé et la première exécution locale de l'application a été vérifiée avec succès.
