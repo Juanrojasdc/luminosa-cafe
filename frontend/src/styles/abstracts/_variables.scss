@@ -1,0 +1,36 @@
+// Colors
+$color-cream: #f6f1e8;
+$color-brown: #3b2a22;
+$color-beige: #d8c7b5;
+$color-gold: #a9854f;
+
+// Typography
+$font-heading: "Playfair Display", serif;
+$font-body: "Montserrat", sans-serif;
+
+// Font sizes
+$font-size-body-mobile: 1rem; // 16px
+$font-size-body-desktop: 1.125rem; // 18px
+
+$font-size-h1-mobile: 1.75rem; // 28px
+$font-size-h1-desktop: 4rem; // 64px
+
+$font-size-button: 0.875rem; // 14px
+$font-size-nav-mobile: 1rem; // 16px
+$font-size-nav-desktop: 0.6875rem; // 11px
+
+// Font weights
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+// Breakpoints
+$breakpoint-tablet: 48rem; // 768px
+$breakpoint-desktop: 64rem; // 1024px
+
+// Layout
+$grid-columns: 12;
+$grid-gutter: 1.25rem; // 20px
+
+$container-padding-mobile: 1.5rem; // 24px
+$container-padding-desktop: 1.25rem; // 20px

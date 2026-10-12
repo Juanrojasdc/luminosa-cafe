@@ -1,7 +1,10 @@
+@use "abstracts/variables" as vars;
+@use "base/reset";
+@use "base/typography";
+@use "layout/container";
+@use "components/header";
+
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #f6f1e8;
-  color: #3b2a22;
+  background-color: vars.$color-cream;
+  color: vars.$color-brown;
 }

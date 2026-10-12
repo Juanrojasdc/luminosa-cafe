@@ -1,0 +1,13 @@
+@use "../abstracts/variables" as vars;
+
+.container {
+  width: 100%;
+  padding-inline: vars.$container-padding-mobile;
+  margin-inline: auto;
+}
+
+@media (min-width: vars.$breakpoint-desktop) {
+  .container {
+    padding-inline: vars.$container-padding-desktop;
+  }
+}
