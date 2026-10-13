@@ -1,0 +1,131 @@
+@use "../abstracts/variables" as vars;
+@use "../abstracts/mixins" as mixins;
+
+.home-hero {
+  display: grid;
+  grid-template-areas:
+    "content"
+    "image"
+    "actions";
+
+  padding-top: 3rem;
+}
+
+.home-hero__content {
+  grid-area: content;
+
+  padding-inline: vars.$container-padding-mobile;
+
+  text-align: center;
+}
+
+.home-hero h1 {
+  margin: 0;
+}
+
+.home-hero__intro {
+  margin: 1.5rem 0 0;
+}
+
+.home-hero__intro-desktop {
+  display: none;
+}
+
+/* El botón integrado en el contenido se muestra únicamente en escritorio */
+.home-hero__cta.home-hero__cta--desktop {
+  display: none;
+}
+
+.home-hero__image {
+  grid-area: image;
+
+  display: block;
+
+  width: 100%;
+  aspect-ratio: 388 / 360;
+  margin-top: 2rem;
+
+  object-fit: cover;
+}
+
+.home-hero__mobile-actions {
+  grid-area: actions;
+
+  padding: 2.5rem vars.$container-padding-mobile 0;
+
+  text-align: center;
+}
+
+.home-hero__selection {
+  max-width: 20.375rem;
+  margin: 0 auto;
+}
+
+.home-hero__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: 2.5rem;
+
+  background-color: vars.$color-brown;
+  color: vars.$color-cream;
+
+  font-family: vars.$font-body;
+  font-size: vars.$font-size-button;
+  font-weight: vars.$font-weight-bold;
+  text-decoration: none;
+}
+
+@include mixins.desktop {
+  .home-hero {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "content image";
+    align-items: center;
+    gap: vars.$grid-gutter;
+
+    padding: 4rem vars.$container-padding-desktop 0;
+  }
+
+  .home-hero__content {
+    padding: 0;
+
+    text-align: left;
+  }
+
+  .home-hero__intro {
+    display: none;
+  }
+
+  .home-hero__intro-desktop {
+    display: block;
+
+    margin: 1rem 0 0;
+  }
+
+  /* El botón de escritorio se integra en la columna de contenido */
+  .home-hero__cta.home-hero__cta--desktop {
+    display: flex;
+
+    width: fit-content;
+    min-width: 10rem;
+    min-height: 3.5rem;
+    margin-top: 2.5rem;
+    padding-inline: 1.5rem;
+  }
+
+  .home-hero__image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+    margin: 0;
+
+    object-fit: initial;
+  }
+
+  .home-hero__mobile-actions {
+    display: none;
+  }
+}

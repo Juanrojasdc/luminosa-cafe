@@ -3,6 +3,7 @@
 @use "base/typography";
 @use "layout/container";
 @use "components/header";
+@use "pages/home";
 
 body {
   background-color: vars.$color-cream;
