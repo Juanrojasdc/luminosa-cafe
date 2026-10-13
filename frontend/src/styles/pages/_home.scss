@@ -79,6 +79,38 @@
   text-decoration: none;
 }
 
+/* Sección À propos */
+
+.home-about {
+  padding-top: 3rem;
+}
+
+.home-about__content {
+  padding-inline: vars.$container-padding-mobile;
+
+  text-align: center;
+}
+
+.home-about h2 {
+  margin: 0;
+
+  font-family: vars.$font-heading;
+  font-size: 1.75rem;
+  font-weight: vars.$font-weight-regular;
+}
+
+.home-about p {
+  margin: 1.5rem 0 0;
+}
+
+.home-about__image {
+  display: block;
+
+  width: 100%;
+  height: auto;
+  margin-top: 2.5rem;
+}
+
 @include mixins.desktop {
   .home-hero {
     grid-template-columns: 1fr 1fr;
@@ -127,5 +159,39 @@
 
   .home-hero__mobile-actions {
     display: none;
+  }
+
+  .home-about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "image content";
+    align-items: center;
+    gap: vars.$grid-gutter;
+
+    padding: 6rem vars.$container-padding-desktop;
+  }
+
+  .home-about__content {
+    grid-area: content;
+
+    padding: 0;
+
+    text-align: left;
+  }
+
+  .home-about h2 {
+    font-size: 4rem;
+  }
+
+  .home-about p {
+    margin: 1.5rem 0 0;
+  }
+
+  .home-about__image {
+    grid-area: image;
+
+    width: 100%;
+    height: auto;
+    margin: 0;
   }
 }

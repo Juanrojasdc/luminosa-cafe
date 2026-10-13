@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import homeInterior from "../assets/img/home-interior.png";
+import homeSign from "../assets/img/home-sign.jpg";
 
 function HomePage() {
   return (
@@ -40,6 +41,25 @@ function HomePage() {
             Découvrir la carte
           </Link>
         </div>
+      </section>
+
+      <section className="home-about">
+        <div className="home-about__content">
+          <h2>À PROPOS</h2>
+
+          <p>
+            Un lieu pour prendre le temps. Luminosa est une cafétéria bordelaise
+            imaginée comme un lieu chaleureux où l'on peut se retrouver autour
+            d'un café, d'un matcha ou d'une douceur. Un espace simple et
+            convivial pour faire une pause et profiter du moment.
+          </p>
+        </div>
+
+        <img
+          className="home-about__image"
+          src={homeSign}
+          alt="Enseigne Luminosa à Bordeaux"
+        />
       </section>
     </main>
   );
