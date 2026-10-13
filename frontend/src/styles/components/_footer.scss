@@ -1,0 +1,276 @@
+@use "../abstracts/variables" as vars;
+@use "../abstracts/mixins" as mixins;
+
+.footer {
+  width: 100%;
+
+  background-color: vars.$color-brown;
+  color: vars.$color-cream;
+}
+
+.footer__inner {
+  width: 100%;
+  padding: 2rem vars.$container-padding-mobile 2.5rem;
+}
+
+/* Identidad */
+
+.footer__brand {
+  padding-bottom: 1rem;
+
+  border-bottom: 1px solid vars.$color-gold;
+}
+
+.footer__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  margin: 0;
+
+  white-space: nowrap;
+}
+
+.footer__logo {
+  font-family: vars.$font-body;
+  font-size: 1rem;
+  font-weight: vars.$font-weight-bold;
+}
+
+.footer__signature {
+  font-family: vars.$font-heading;
+  font-size: 1.25rem;
+  font-weight: vars.$font-weight-regular;
+  font-style: italic;
+}
+
+.footer__stars {
+  color: vars.$color-gold;
+
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* Horarios */
+
+.footer__hours {
+  margin-top: 2.5rem;
+}
+
+.footer__hours h2 {
+  margin: 0;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-regular;
+  line-height: 1.4;
+}
+
+.footer__schedule {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.footer__schedule li {
+  display: flex;
+  gap: 0.35rem;
+
+  margin: 0;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-regular;
+  line-height: 1.4;
+}
+
+.footer__schedule li span:first-child::after {
+  content: " —";
+}
+
+.footer__schedule strong {
+  font-weight: vars.$font-weight-bold;
+}
+
+/* Redes sociales */
+
+.footer__socials {
+  margin-top: 2.5rem;
+}
+
+.footer__socials h2 {
+  margin: 0 0 1rem;
+
+  font-family: vars.$font-heading;
+  font-size: 1.125rem;
+  font-weight: vars.$font-weight-medium;
+  line-height: 1.4;
+}
+
+.footer__socials ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.footer__socials a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  min-height: 1.875rem;
+
+  color: vars.$color-cream;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-regular;
+  text-decoration: none;
+}
+
+.footer__social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 1.25rem;
+  height: 1.25rem;
+
+  flex-shrink: 0;
+}
+
+.footer__socials a:focus-visible {
+  outline: 2px solid vars.$color-cream;
+  outline-offset: 0.25rem;
+}
+
+/* Escritorio */
+
+@include mixins.desktop {
+  .footer {
+    min-height: 6.25rem;
+  }
+
+  .footer__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+
+    min-height: 6.25rem;
+    padding: 0 vars.$container-padding-desktop;
+  }
+
+  .footer__brand {
+    align-self: stretch;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0;
+
+    border-bottom: 0;
+  }
+
+  .footer__identity {
+    gap: 0.5rem;
+  }
+
+  .footer__logo {
+    font-size: 0.875rem;
+  }
+
+  .footer__signature {
+    font-size: 1rem;
+  }
+
+  .footer__stars {
+    font-size: 1rem;
+  }
+
+  .footer__hours {
+    margin: 0;
+
+    text-align: center;
+  }
+
+  .footer__hours h2 {
+    font-size: 0.9375rem;
+  }
+
+  .footer__schedule {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+
+  .footer__schedule li {
+    display: contents;
+
+    font-size: 0.9375rem;
+  }
+
+  .footer__schedule li span:first-child::after {
+    content: ",";
+  }
+
+  .footer__schedule li:not(:last-child) span:last-child::after {
+    content: ",";
+  }
+
+  .footer__schedule .footer__closed span:first-child::after {
+    content: " ·";
+  }
+
+  .footer__schedule .footer__closed strong::after {
+    content: "";
+  }
+
+  .footer__schedule li:nth-child(n + 2):not(.footer__closed) {
+    display: none;
+  }
+
+  .footer__closed {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+
+  .footer__socials {
+    margin: 0;
+
+    text-align: center;
+  }
+
+  .footer__socials h2 {
+    margin: 0 0 0.35rem;
+
+    font-family: vars.$font-body;
+    font-size: 0.9375rem;
+    font-weight: vars.$font-weight-regular;
+  }
+
+  .footer__socials ul {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .footer__socials a {
+    gap: 0.35rem;
+
+    min-height: auto;
+
+    font-size: 0.9375rem;
+  }
+
+  .footer__social-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
