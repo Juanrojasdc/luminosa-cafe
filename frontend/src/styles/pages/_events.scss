@@ -154,7 +154,8 @@
 
 @include mixins.desktop {
   .events-page__container {
-    padding: 4rem vars.$container-padding-desktop 5rem;
+    // Mismo margen lateral que Home, Menu, Header y Footer.
+    padding: 4rem 5rem 5rem;
   }
 
   .events-page__header {
