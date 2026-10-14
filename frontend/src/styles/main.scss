@@ -5,6 +5,7 @@
 @use "components/header";
 @use "components/footer";
 @use "pages/home";
+@use "pages/menu";
 
 body {
   background-color: vars.$color-cream;
