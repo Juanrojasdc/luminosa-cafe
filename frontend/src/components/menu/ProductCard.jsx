@@ -1,11 +1,9 @@
+import ProductImage from "./ProductImage";
+
 function ProductCard({ product }) {
   return (
     <article className="product-card">
-      <img
-        className="product-card__image"
-        src={product.image}
-        alt={product.name}
-      />
+      <ProductImage src={product.image} alt={product.name} />
 
       <div className="product-card__content">
         <div className="product-card__header">

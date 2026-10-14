@@ -274,3 +274,22 @@
     text-align: left;
   }
 }
+
+/* Imagen de sustitución cuando no hay fotografía disponible */
+.product-card__image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  aspect-ratio: 276 / 157;
+
+  background-color: vars.$color-beige;
+  color: vars.$color-brown;
+
+  font-family: vars.$font-heading;
+  font-size: 1.5rem;
+  font-weight: vars.$font-weight-regular;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
