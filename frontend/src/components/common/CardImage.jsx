@@ -1,14 +1,16 @@
 import { useState } from "react";
 
-function ProductImage({ src, alt }) {
+function CardImage({ src, alt, className, placeholderClassName }) {
+  // Guardamos la ruta que ha fallado al cargar.
   const [failedSrc, setFailedSrc] = useState(null);
 
-  const hasValidImage = Boolean(src) && failedSrc !== src;
+  // Si no hay imagen o falla la carga, mostramos el placeholder.
+  const hasImage = Boolean(src) && failedSrc !== src;
 
-  if (!hasValidImage) {
+  if (!hasImage) {
     return (
       <div
-        className="product-card__image-placeholder"
+        className={placeholderClassName}
         role="img"
         aria-label={`Photographie non disponible pour ${alt}`}
       >
@@ -19,7 +21,7 @@ function ProductImage({ src, alt }) {
 
   return (
     <img
-      className="product-card__image"
+      className={className}
       src={src}
       alt={alt}
       loading="lazy"
@@ -28,4 +30,4 @@ function ProductImage({ src, alt }) {
   );
 }
 
-export default ProductImage;
+export default CardImage;

@@ -1,0 +1,242 @@
+@use "../abstracts/variables" as vars;
+@use "../abstracts/mixins" as mixins;
+
+// ========================================
+// PÁGINA CONTACT - MOBILE FIRST
+// ========================================
+
+.contact-page {
+  width: 100%;
+}
+
+.contact-page__container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+
+  padding: 2rem vars.$container-padding-mobile 3rem;
+}
+
+// ========================================
+// INFORMACIÓN DE CONTACTO
+// ========================================
+
+.contact-page__information {
+  min-width: 0;
+}
+
+.contact-page__eyebrow {
+  margin: 0 0 2.5rem;
+
+  font-family: vars.$font-body;
+  font-size: 0.75rem;
+  font-weight: vars.$font-weight-regular;
+}
+
+.contact-page__information h1 {
+  margin: 0;
+
+  color: vars.$color-brown;
+  font-family: vars.$font-heading;
+  font-size: vars.$font-size-h1-mobile;
+  font-weight: vars.$font-weight-regular;
+}
+
+.contact-page__intro {
+  display: none;
+}
+
+.contact-page__details {
+  margin-top: 1.25rem;
+}
+
+.contact-page__location {
+  margin: 0;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-regular;
+}
+
+.contact-page__response {
+  display: none;
+}
+
+// ========================================
+// FORMULARIO
+// ========================================
+
+.contact-page__form-section {
+  min-width: 0;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.contact-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-form__field label {
+  color: vars.$color-brown;
+  font-family: vars.$font-body;
+  font-size: 0.75rem;
+  font-weight: vars.$font-weight-bold;
+}
+
+.contact-form__field input,
+.contact-form__field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+
+  padding: 0.75rem;
+  border: 1px solid vars.$color-beige;
+  border-radius: 0;
+
+  background-color: #fff;
+  color: vars.$color-brown;
+
+  font-family: vars.$font-body;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.contact-form__field input {
+  min-height: 2.75rem;
+}
+
+.contact-form__field textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.contact-form__field input:focus-visible,
+.contact-form__field textarea:focus-visible {
+  outline: 2px solid vars.$color-gold;
+  outline-offset: 2px;
+}
+
+// ========================================
+// BOTÓN DE ENVÍO
+// ========================================
+
+.contact-form__submit {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+
+  padding: 0.75rem 1.5rem;
+  border: 1px solid vars.$color-brown;
+  border-radius: 0;
+
+  background-color: vars.$color-brown;
+  color: vars.$color-cream;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-bold;
+
+  cursor: pointer;
+}
+
+.contact-form__submit:focus-visible {
+  outline: 2px solid vars.$color-gold;
+  outline-offset: 3px;
+}
+
+// El botón permanece desactivado hasta conectar
+// el servicio real de envío de mensajes.
+.contact-form__submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+// ========================================
+// ESCRITORIO
+// ========================================
+
+@include mixins.desktop {
+  .contact-page__container {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 5rem;
+
+    padding: 4rem vars.$container-padding-desktop 6rem;
+  }
+
+  .contact-page__eyebrow {
+    display: none;
+  }
+
+  .contact-page__information h1 {
+    font-size: 4rem;
+  }
+
+  .contact-page__intro {
+    display: block;
+    margin: 1.5rem 0 0;
+
+    font-family: vars.$font-body;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .contact-page__details {
+    max-width: 27rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+
+    border-top: 1px solid vars.$color-gold;
+  }
+
+  .contact-page__location {
+    font-size: 0.75rem;
+    font-weight: vars.$font-weight-bold;
+    text-transform: uppercase;
+  }
+
+  .contact-page__response {
+    display: block;
+    margin: 1.25rem 0 0;
+
+    font-family: vars.$font-body;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .contact-form {
+    gap: 1.75rem;
+  }
+
+  .contact-form__field input {
+    min-height: 3rem;
+  }
+
+  .contact-form__field textarea {
+    min-height: 9rem;
+  }
+
+  .contact-form__submit {
+    width: 11.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .contact-form__submit:not(:disabled):hover {
+    background-color: vars.$color-gold;
+    border-color: vars.$color-gold;
+  }
+}
+
+// Mensajes de información o error del formulario.
+.contact-form__feedback {
+  margin: 0;
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: vars.$color-brown;
+}

@@ -3,7 +3,6 @@
 
 .footer {
   width: 100%;
-
   background-color: vars.$color-brown;
   color: vars.$color-cream;
 }
@@ -13,11 +12,9 @@
   padding: 2rem vars.$container-padding-mobile 2.5rem;
 }
 
-/* Identidad */
-
+// Identidad
 .footer__brand {
   padding-bottom: 1rem;
-
   border-bottom: 1px solid vars.$color-gold;
 }
 
@@ -25,9 +22,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-
   margin: 0;
-
   white-space: nowrap;
 }
 
@@ -46,20 +41,17 @@
 
 .footer__stars {
   color: vars.$color-gold;
-
   font-size: 1.25rem;
   line-height: 1;
 }
 
-/* Horarios */
-
+// Horarios
 .footer__hours {
   margin-top: 2.5rem;
 }
 
 .footer__hours h2 {
   margin: 0;
-
   font-family: vars.$font-body;
   font-size: 0.875rem;
   font-weight: vars.$font-weight-regular;
@@ -69,16 +61,13 @@
 .footer__schedule {
   margin: 0;
   padding: 0;
-
   list-style: none;
 }
 
 .footer__schedule li {
   display: flex;
   gap: 0.35rem;
-
   margin: 0;
-
   font-family: vars.$font-body;
   font-size: 0.875rem;
   font-weight: vars.$font-weight-regular;
@@ -93,15 +82,13 @@
   font-weight: vars.$font-weight-bold;
 }
 
-/* Redes sociales */
-
+// Redes sociales
 .footer__socials {
   margin-top: 2.5rem;
 }
 
 .footer__socials h2 {
   margin: 0 0 1rem;
-
   font-family: vars.$font-heading;
   font-size: 1.125rem;
   font-weight: vars.$font-weight-medium;
@@ -112,10 +99,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-
   margin: 0;
   padding: 0;
-
   list-style: none;
 }
 
@@ -123,11 +108,8 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-
   min-height: 1.875rem;
-
   color: vars.$color-cream;
-
   font-family: vars.$font-body;
   font-size: 0.875rem;
   font-weight: vars.$font-weight-regular;
@@ -138,10 +120,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   width: 1.25rem;
   height: 1.25rem;
-
   flex-shrink: 0;
 }
 
@@ -150,8 +130,7 @@
   outline-offset: 0.25rem;
 }
 
-/* Escritorio */
-
+// Escritorio
 @include mixins.desktop {
   .footer {
     min-height: 6.25rem;
@@ -161,19 +140,17 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
-
     min-height: 6.25rem;
-    padding: 0 vars.$container-padding-desktop;
+
+    // Mismo margen lateral que el Header.
+    padding: 0 5rem;
   }
 
   .footer__brand {
     align-self: stretch;
-
     display: flex;
     align-items: center;
-
     padding: 0;
-
     border-bottom: 0;
   }
 
@@ -195,7 +172,6 @@
 
   .footer__hours {
     margin: 0;
-
     text-align: center;
   }
 
@@ -211,7 +187,6 @@
 
   .footer__schedule li {
     display: contents;
-
     font-size: 0.9375rem;
   }
 
@@ -243,13 +218,11 @@
 
   .footer__socials {
     margin: 0;
-
     text-align: center;
   }
 
   .footer__socials h2 {
     margin: 0 0 0.35rem;
-
     font-family: vars.$font-body;
     font-size: 0.9375rem;
     font-weight: vars.$font-weight-regular;
@@ -263,9 +236,7 @@
 
   .footer__socials a {
     gap: 0.35rem;
-
     min-height: auto;
-
     font-size: 0.9375rem;
   }
 

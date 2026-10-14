@@ -6,6 +6,8 @@
 @use "components/footer";
 @use "pages/home";
 @use "pages/menu";
+@use "pages/events";
+@use "pages/contact";
 
 body {
   background-color: vars.$color-cream;

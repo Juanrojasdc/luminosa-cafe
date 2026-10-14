@@ -1,0 +1,243 @@
+@use "../abstracts/variables" as vars;
+@use "../abstracts/mixins" as mixins;
+
+// ========================================
+// PÁGINA EVENTS - MOBILE FIRST
+// ========================================
+
+.events-page {
+  width: 100%;
+}
+
+.events-page__container {
+  padding: 2rem vars.$container-padding-mobile 3rem;
+}
+
+// Encabezado de la página
+.events-page__header {
+  text-align: center;
+}
+
+.events-page__eyebrow {
+  margin: 0 0 2.5rem;
+
+  font-family: vars.$font-body;
+  font-size: 0.75rem;
+  font-weight: vars.$font-weight-bold;
+}
+
+.events-page__header h1 {
+  margin: 0;
+
+  font-family: vars.$font-heading;
+  font-size: vars.$font-size-h1-mobile;
+  font-weight: vars.$font-weight-regular;
+}
+
+// Distribución general
+.events-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+
+  margin-top: 2.5rem;
+}
+
+.events-page__section {
+  min-width: 0;
+}
+
+.events-page__section > h2 {
+  margin: 0 0 2rem;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-bold;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.events-page__list {
+  display: grid;
+  gap: 2rem;
+}
+
+.events-page__empty {
+  margin: 0;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+// ========================================
+// TARJETAS DE EVENTOS
+// ========================================
+
+.event-card {
+  min-width: 0;
+  overflow: hidden;
+
+  border: 1px solid vars.$color-gold;
+  background-color: vars.$color-cream;
+}
+
+// Fotografía
+.event-card__image {
+  display: block;
+
+  width: 100%;
+  aspect-ratio: 340 / 215;
+  object-fit: cover;
+}
+
+// Sustituto cuando falta la fotografía
+.event-card__image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  aspect-ratio: 340 / 215;
+
+  background-color: vars.$color-beige;
+  color: vars.$color-brown;
+
+  font-family: vars.$font-heading;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+// Contenido de la tarjeta
+.event-card__content {
+  min-width: 0;
+  padding: 0.75rem;
+}
+
+.event-card__title {
+  margin: 0;
+
+  font-family: vars.$font-body;
+  font-size: 1rem;
+  font-weight: vars.$font-weight-bold;
+  line-height: 1.3;
+}
+
+.event-card__schedule {
+  margin: 0.5rem 0 0;
+
+  font-family: vars.$font-body;
+  font-size: 0.75rem;
+  font-weight: vars.$font-weight-bold;
+  line-height: 1.4;
+}
+
+.event-card__description {
+  margin: 1rem 0 0;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-regular;
+  line-height: 1.4;
+}
+
+// Los eventos pasados utilizan un fondo diferente
+.event-card--past .event-card__content {
+  background-color: vars.$color-beige;
+}
+
+// ========================================
+// ESCRITORIO
+// ========================================
+
+@include mixins.desktop {
+  .events-page__container {
+    padding: 4rem vars.$container-padding-desktop 5rem;
+  }
+
+  .events-page__header {
+    text-align: left;
+  }
+
+  .events-page__eyebrow {
+    display: none;
+  }
+
+  .events-page__header h1 {
+    font-size: 4rem;
+  }
+
+  // Dos columnas: próximos eventos y eventos pasados
+  .events-page__layout {
+    grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
+    gap: 3.5rem;
+
+    margin-top: 2rem;
+  }
+
+  .events-page__section > h2 {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+
+    border-bottom: 1px solid vars.$color-gold;
+    text-align: left;
+  }
+
+  .events-page__list {
+    gap: 1.5rem;
+  }
+
+  .events-page__empty {
+    text-align: left;
+  }
+
+  // Los eventos próximos se muestran horizontalmente
+  .event-card--upcoming {
+    display: grid;
+    grid-template-columns: minmax(0, 190px) minmax(0, 1fr);
+  }
+
+  .event-card--upcoming .event-card__image,
+  .event-card--upcoming .event-card__image-placeholder {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .event-card--upcoming .event-card__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 1.5rem 2rem;
+  }
+
+  .event-card--upcoming .event-card__title {
+    font-size: 1.125rem;
+  }
+
+  .event-card--upcoming .event-card__schedule {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid vars.$color-gold;
+  }
+
+  .event-card--upcoming .event-card__description {
+    margin-top: 1rem;
+  }
+
+  // Los eventos pasados mantienen la imagen arriba
+  .event-card--past .event-card__content {
+    padding: 1.25rem;
+  }
+
+  .event-card--past .event-card__title {
+    font-size: 1.125rem;
+  }
+
+  .event-card--past .event-card__image,
+  .event-card--past .event-card__image-placeholder {
+    aspect-ratio: 400 / 140;
+  }
+}

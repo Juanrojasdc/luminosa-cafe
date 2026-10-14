@@ -1,6 +1,10 @@
 @use "../abstracts/variables" as vars;
 @use "../abstracts/mixins" as mixins;
 
+// ========================================
+// HOME - HERO (MOBILE FIRST)
+// ========================================
+
 .home-hero {
   display: grid;
   grid-template-areas:
@@ -31,7 +35,8 @@
   display: none;
 }
 
-/* El botón integrado en el contenido se muestra únicamente en escritorio */
+// El botón integrado en el contenido se muestra
+// únicamente en escritorio.
 .home-hero__cta.home-hero__cta--desktop {
   display: none;
 }
@@ -79,7 +84,9 @@
   text-decoration: none;
 }
 
-/* Sección À propos */
+// ========================================
+// HOME - À PROPOS (MOBILE FIRST)
+// ========================================
 
 .home-about {
   padding-top: 3rem;
@@ -112,14 +119,19 @@
   margin-top: 2.5rem;
 }
 
+// ========================================
+// HOME - DESKTOP
+// ========================================
+
 @include mixins.desktop {
   .home-hero {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas: "content image";
     align-items: center;
     gap: vars.$grid-gutter;
 
-    padding: 4rem vars.$container-padding-desktop 0;
+    // Alineación con Header y Footer según Figma.
+    padding: 4rem 5rem 0;
   }
 
   .home-hero__content {
@@ -138,7 +150,8 @@
     margin: 1rem 0 0;
   }
 
-  /* El botón de escritorio se integra en la columna de contenido */
+  // El botón de escritorio se integra
+  // en la columna de contenido.
   .home-hero__cta.home-hero__cta--desktop {
     display: flex;
 
@@ -151,25 +164,30 @@
 
   .home-hero__image {
     width: 100%;
-    height: auto;
+    height: 43rem;
     aspect-ratio: auto;
     margin: 0;
 
-    object-fit: initial;
+    object-fit: cover;
   }
 
   .home-hero__mobile-actions {
     display: none;
   }
 
+  // ========================================
+  // À PROPOS - DESKTOP
+  // ========================================
+
   .home-about {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas: "image content";
     align-items: center;
     gap: vars.$grid-gutter;
 
-    padding: 6rem vars.$container-padding-desktop;
+    // Mismo margen lateral que Hero, Header y Footer.
+    padding: 6rem 5rem;
   }
 
   .home-about__content {
