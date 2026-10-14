@@ -82,6 +82,36 @@
   font-size: vars.$font-size-button;
   font-weight: vars.$font-weight-bold;
   text-decoration: none;
+
+  // Transición suave entre los estados.
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+// Estado hover: ratón sobre el botón.
+.home-hero__cta:hover {
+  background-color: vars.$color-gold;
+  color: vars.$color-cream;
+}
+
+// Estado active: mientras se mantiene pulsado.
+.home-hero__cta:active {
+  background-color: vars.$color-beige;
+  color: vars.$color-brown;
+}
+
+// Accesibilidad: navegación mediante teclado.
+.home-hero__cta:focus-visible {
+  outline: 2px solid vars.$color-gold;
+  outline-offset: 3px;
+}
+
+// Respeta la preferencia de movimiento reducido.
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__cta {
+    transition: none;
+  }
 }
 
 // ========================================

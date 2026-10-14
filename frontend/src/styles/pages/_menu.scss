@@ -73,17 +73,46 @@
   line-height: 1.2;
 
   cursor: pointer;
+
+  // Transición suave entre los estados.
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
+// Estado seleccionado: permanece después del clic.
 .category-navigation__button--active {
   border-color: vars.$color-brown;
   background-color: vars.$color-brown;
   color: vars.$color-cream;
 }
 
+// Hover: se aplica también a la categoría seleccionada.
+.category-navigation__button:hover {
+  border-color: vars.$color-gold;
+  background-color: vars.$color-gold;
+  color: vars.$color-cream;
+}
+
+// Active: mientras se mantiene pulsado el botón.
+.category-navigation__button:active {
+  border-color: vars.$color-beige;
+  background-color: vars.$color-beige;
+  color: vars.$color-brown;
+}
+
+// Accesibilidad: navegación mediante teclado.
 .category-navigation__button:focus-visible {
-  outline: 2px solid vars.$color-brown;
-  outline-offset: 0.2rem;
+  outline: 2px solid vars.$color-gold;
+  outline-offset: 3px;
+}
+
+// Respeta la preferencia de movimiento reducido.
+@media (prefers-reduced-motion: reduce) {
+  .category-navigation__button {
+    transition: none;
+  }
 }
 
 /* =========================
@@ -208,7 +237,8 @@
 
 @include mixins.desktop {
   .menu-page__catalog {
-    padding: 4rem vars.$container-padding-desktop 5rem;
+    // Mismo margen lateral que Home, Header y Footer.
+    padding: 4rem 5rem 5rem;
   }
 
   .menu-page__header {
@@ -275,7 +305,11 @@
   }
 }
 
-/* Imagen de sustitución cuando no hay fotografía disponible */
+/* =========================
+   Image placeholder
+   ========================= */
+
+// Imagen de sustitución cuando no hay fotografía disponible.
 .product-card__image-placeholder {
   display: flex;
   align-items: center;

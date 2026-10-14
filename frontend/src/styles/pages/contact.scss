@@ -143,18 +143,46 @@
   font-weight: vars.$font-weight-bold;
 
   cursor: pointer;
+
+  // Transición suave entre estados.
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
+// Hover únicamente cuando el botón está habilitado.
+.contact-form__submit:not(:disabled):hover {
+  background-color: vars.$color-gold;
+  border-color: vars.$color-gold;
+  color: vars.$color-cream;
+}
+
+// Active únicamente cuando el botón está habilitado.
+.contact-form__submit:not(:disabled):active {
+  background-color: vars.$color-beige;
+  border-color: vars.$color-beige;
+  color: vars.$color-brown;
+}
+
+// Accesibilidad: navegación mediante teclado.
 .contact-form__submit:focus-visible {
   outline: 2px solid vars.$color-gold;
   outline-offset: 3px;
 }
 
 // El botón permanece desactivado hasta conectar
-// el servicio real de envío de mensajes.
+// el envío real de mensajes mediante Symfony.
 .contact-form__submit:disabled {
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+// Respeta la preferencia de movimiento reducido.
+@media (prefers-reduced-motion: reduce) {
+  .contact-form__submit {
+    transition: none;
+  }
 }
 
 // ========================================
@@ -225,14 +253,12 @@
     width: 11.25rem;
     margin-top: 1.5rem;
   }
-
-  .contact-form__submit:not(:disabled):hover {
-    background-color: vars.$color-gold;
-    border-color: vars.$color-gold;
-  }
 }
 
-// Mensajes de información o error del formulario.
+// ========================================
+// MENSAJES DEL FORMULARIO
+// ========================================
+
 .contact-form__feedback {
   margin: 0;
   font-family: vars.$font-body;
