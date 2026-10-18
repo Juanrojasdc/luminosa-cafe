@@ -1,0 +1,356 @@
+@use "../abstracts/variables" as vars;
+@use "../abstracts/mixins" as mixins;
+
+// ========================================
+// ADMINISTRACIÓN DE CATEGORÍAS
+// ========================================
+
+.admin-categories {
+  width: 100%;
+  min-width: 0;
+  color: vars.$color-brown;
+
+  // Encabezado y botón de creación
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    h1 {
+      margin: 0;
+      font-family: vars.$font-heading;
+      font-size: 2rem;
+      font-weight: vars.$font-weight-regular;
+    }
+  }
+
+  &__intro {
+    margin: 0.5rem 0 0;
+    line-height: 1.6;
+  }
+
+  &__add-button {
+    min-height: 2.75rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid vars.$color-brown;
+    background-color: vars.$color-brown;
+    color: vars.$color-cream;
+    font-family: vars.$font-body;
+    font-size: 0.875rem;
+    font-weight: vars.$font-weight-medium;
+    cursor: pointer;
+  }
+
+  // Avisos y mensajes
+
+  &__notice,
+  &__message {
+    margin: 0 0 1.5rem;
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  &__notice {
+    border-left: 3px solid vars.$color-gold;
+    background-color: vars.$color-cream;
+  }
+
+  &__message {
+    border: 1px solid vars.$color-beige;
+    background-color: vars.$color-beige;
+  }
+
+  // Lista de categorías
+
+  &__list {
+    margin-bottom: 3rem;
+  }
+
+  &__subtitle {
+    margin: 0 0 1.5rem;
+    font-family: vars.$font-heading;
+    font-size: 1.5rem;
+    font-weight: vars.$font-weight-regular;
+  }
+
+  &__empty {
+    padding: 1.5rem;
+    background-color: vars.$color-cream;
+  }
+
+  // La tabla se muestra únicamente en escritorio
+
+  &__table-wrapper {
+    display: none;
+  }
+
+  // Tarjetas para móvil
+
+  &__cards {
+    display: grid;
+    gap: 1rem;
+  }
+
+  &__card {
+    padding: 1.5rem;
+    border: 1px solid vars.$color-beige;
+    background-color: vars.$color-cream;
+
+    h3 {
+      margin: 0 0 1rem;
+      font-family: vars.$font-heading;
+      font-size: 1.25rem;
+      font-weight: vars.$font-weight-regular;
+    }
+
+    p {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    strong {
+      font-weight: vars.$font-weight-medium;
+    }
+  }
+
+  // Botones de modificación y eliminación
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    button {
+      padding: 0.375rem 0;
+      border: 0;
+      background: transparent;
+      color: vars.$color-brown;
+      font-family: vars.$font-body;
+      font-size: 0.875rem;
+      font-weight: vars.$font-weight-medium;
+      text-decoration: underline;
+      text-underline-offset: 0.2rem;
+      cursor: pointer;
+    }
+  }
+
+  // Presentación en escritorio
+
+  @include mixins.desktop {
+    &__header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__table-wrapper {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    &__table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+
+      th,
+      td {
+        padding: 1rem;
+        vertical-align: middle;
+        font-size: 0.875rem;
+      }
+
+      th {
+        background-color: vars.$color-beige;
+        font-weight: vars.$font-weight-bold;
+      }
+
+      tbody tr:nth-child(odd) {
+        background-color: vars.$color-cream;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #fff;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid vars.$color-beige;
+      }
+    }
+
+    &__cards {
+      display: none;
+    }
+
+    &__actions {
+      margin-top: 0;
+    }
+  }
+}
+
+// ========================================
+// FORMULARIO DE CATEGORÍAS
+// ========================================
+
+.admin-category-form {
+  padding: 1.5rem;
+  border: 1px solid vars.$color-beige;
+  background-color: vars.$color-cream;
+  color: vars.$color-brown;
+
+  h2 {
+    margin: 0 0 2rem;
+    font-family: vars.$font-heading;
+    font-size: 1.5rem;
+    font-weight: vars.$font-weight-regular;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.875rem;
+      font-weight: vars.$font-weight-medium;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      min-height: 2.75rem;
+      padding: 0.75rem;
+      border: 1px solid vars.$color-beige;
+      border-radius: 0;
+      background-color: #fff;
+      color: vars.$color-brown;
+      font-family: vars.$font-body;
+      font-size: 1rem;
+    }
+
+    textarea {
+      min-height: 7rem;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      height: auto;
+      font-size: 0.875rem;
+    }
+  }
+
+  &__image-name,
+  &__hint {
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  &__submit,
+  &__cancel {
+    min-height: 2.75rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid vars.$color-brown;
+    font-family: vars.$font-body;
+    font-size: 0.875rem;
+    font-weight: vars.$font-weight-medium;
+    cursor: pointer;
+  }
+
+  &__submit {
+    background-color: vars.$color-brown;
+    color: vars.$color-cream;
+  }
+
+  &__cancel {
+    background-color: transparent;
+    color: vars.$color-brown;
+  }
+
+  // Formulario en dos columnas desde escritorio
+
+  @include mixins.desktop {
+    padding: 2rem;
+
+    &__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem 2rem;
+    }
+
+    &__field--full {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+// ========================================
+// INTERACCIONES Y ACCESIBILIDAD
+// ========================================
+
+.admin-categories__add-button,
+.admin-category-form__submit,
+.admin-category-form__cancel {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:not(:disabled):hover {
+    background-color: vars.$color-gold;
+    border-color: vars.$color-gold;
+    color: vars.$color-cream;
+  }
+
+  &:not(:disabled):active {
+    background-color: vars.$color-beige;
+    border-color: vars.$color-brown;
+    color: vars.$color-brown;
+  }
+}
+
+.admin-categories__actions button {
+  &:hover {
+    color: vars.$color-gold;
+  }
+
+  &:active {
+    color: vars.$color-brown;
+  }
+}
+
+.admin-categories button:focus-visible,
+.admin-category-form button:focus-visible,
+.admin-category-form input:focus-visible,
+.admin-category-form textarea:focus-visible {
+  outline: 2px solid vars.$color-gold;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-categories__add-button,
+  .admin-category-form__submit,
+  .admin-category-form__cancel {
+    transition: none;
+  }
+}

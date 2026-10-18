@@ -1,13 +1,23 @@
 @use "abstracts/variables" as vars;
+
 @use "base/reset";
 @use "base/typography";
+
 @use "layout/container";
+@use "layout/admin-layout";
+
 @use "components/header";
 @use "components/footer";
+
 @use "pages/home";
 @use "pages/menu";
 @use "pages/events";
 @use "pages/contact";
+
+@use "pages/admin-login";
+@use "pages/admin-products";
+@use "pages/admin-categories";
+@use "pages/admin-events";
 
 body {
   background-color: vars.$color-cream;

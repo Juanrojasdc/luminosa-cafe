@@ -1,0 +1,210 @@
+@use "../abstracts/variables" as vars;
+@use "../abstracts/mixins" as mixins;
+
+// ========================================
+// PÁGINA DE CONEXIÓN
+// ========================================
+
+.admin-login {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: vars.$color-cream;
+}
+
+// ========================================
+// ENCABEZADO
+// ========================================
+
+.admin-login__header {
+  padding: 1.625rem vars.$container-padding-mobile 0;
+}
+
+.admin-login__brand {
+  margin: 0;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid vars.$color-gold;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-bold;
+}
+
+// ========================================
+// CONTENIDO
+// ========================================
+
+.admin-login__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  padding: 8rem vars.$container-padding-mobile 3rem;
+}
+
+.admin-login__card {
+  width: 100%;
+}
+
+.admin-login__card h1 {
+  margin: 0;
+
+  font-family: vars.$font-body;
+  font-size: 1.75rem;
+  font-weight: vars.$font-weight-bold;
+  line-height: 1.2;
+}
+
+.admin-login__intro {
+  margin: 1.5rem 0 0;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+// ========================================
+// FORMULARIO
+// ========================================
+
+.admin-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  margin-top: 1.5rem;
+}
+
+.admin-login__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-login__field label {
+  font-family: vars.$font-body;
+  font-size: 0.75rem;
+  font-weight: vars.$font-weight-bold;
+}
+
+.admin-login__field input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+
+  padding: 0.75rem;
+  border: 1px solid vars.$color-beige;
+  border-radius: 0;
+
+  background-color: #fff;
+  color: vars.$color-brown;
+
+  font-family: vars.$font-body;
+  font-size: 1rem;
+}
+
+.admin-login__field input:focus-visible {
+  outline: 2px solid vars.$color-gold;
+  outline-offset: 2px;
+}
+
+// ========================================
+// BOTÓN
+// ========================================
+
+.admin-login__submit {
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: 0.25rem;
+
+  border: 1px solid vars.$color-brown;
+  border-radius: 0;
+
+  background-color: vars.$color-brown;
+  color: vars.$color-cream;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-medium;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.admin-login__submit:not(:disabled):hover {
+  background-color: vars.$color-gold;
+  border-color: vars.$color-gold;
+}
+
+.admin-login__submit:not(:disabled):active {
+  background-color: vars.$color-beige;
+  border-color: vars.$color-beige;
+  color: vars.$color-brown;
+}
+
+.admin-login__submit:focus-visible {
+  outline: 2px solid vars.$color-gold;
+  outline-offset: 3px;
+}
+
+.admin-login__submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-login__submit {
+    transition: none;
+  }
+}
+
+// ========================================
+// ESCRITORIO
+// ========================================
+
+@include mixins.desktop {
+  .admin-login__header {
+    padding: 2rem 5rem 0;
+  }
+
+  .admin-login__main {
+    align-items: center;
+    justify-content: flex-start;
+    padding: 7rem 5rem 5rem;
+  }
+
+  .admin-login__card {
+    max-width: 31.25rem;
+    padding: 5rem 3.75rem 6rem;
+
+    border: 1px solid vars.$color-beige;
+    background-color: #fff;
+  }
+
+  .admin-login__card h1 {
+    font-size: 2rem;
+  }
+
+  .admin-login__intro {
+    margin-top: 1rem;
+  }
+
+  .admin-login__form {
+    gap: 2rem;
+    margin-top: 2.5rem;
+  }
+
+  .admin-login__field input {
+    min-height: 3rem;
+  }
+
+  .admin-login__submit {
+    min-height: 3.125rem;
+    margin-top: 0.5rem;
+  }
+}

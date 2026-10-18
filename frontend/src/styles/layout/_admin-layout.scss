@@ -1,0 +1,172 @@
+@use "../abstracts/variables" as vars;
+@use "../abstracts/mixins" as mixins;
+
+// ========================================
+// ESTRUCTURA GENERAL
+// ========================================
+
+.admin-layout {
+  min-height: 100vh;
+  background-color: vars.$color-cream;
+}
+
+.admin-layout__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-layout__main {
+  min-width: 0;
+  width: 100%;
+  padding: 1.5rem vars.$container-padding-mobile 3rem;
+}
+
+// ========================================
+// ENCABEZADO
+// ========================================
+
+.admin-header {
+  width: 100%;
+  padding: 1.625rem vars.$container-padding-mobile 0;
+}
+
+.admin-header__inner {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  border-bottom: 1px solid vars.$color-gold;
+}
+
+.admin-header__brand {
+  margin: 0;
+  color: vars.$color-brown;
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-bold;
+}
+
+// ========================================
+// NAVEGACIÓN
+// ========================================
+
+.admin-navigation {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 vars.$container-padding-mobile;
+}
+
+.admin-navigation__link,
+.admin-navigation__logout {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.75rem;
+
+  border: 1px solid vars.$color-beige;
+  border-bottom: 0;
+  border-radius: 0;
+
+  background-color: transparent;
+  color: vars.$color-brown;
+
+  font-family: vars.$font-body;
+  font-size: 0.875rem;
+  font-weight: vars.$font-weight-regular;
+  line-height: 1.4;
+  text-align: left;
+  text-decoration: none;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.admin-navigation__link:last-of-type {
+  border-bottom: 0;
+}
+
+.admin-navigation__logout {
+  border-bottom: 1px solid vars.$color-beige;
+  cursor: pointer;
+}
+
+.admin-navigation__link--active {
+  background-color: vars.$color-beige;
+  font-weight: vars.$font-weight-bold;
+}
+
+.admin-navigation__link:hover,
+.admin-navigation__logout:not(:disabled):hover {
+  background-color: vars.$color-gold;
+  color: vars.$color-cream;
+}
+
+.admin-navigation__link:active,
+.admin-navigation__logout:not(:disabled):active {
+  background-color: vars.$color-beige;
+  color: vars.$color-brown;
+}
+
+.admin-navigation__link:focus-visible,
+.admin-navigation__logout:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid vars.$color-gold;
+  outline-offset: 2px;
+}
+
+.admin-navigation__logout:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-navigation__link,
+  .admin-navigation__logout {
+    transition: none;
+  }
+}
+
+// ========================================
+// ESCRITORIO
+// ========================================
+
+@include mixins.desktop {
+  .admin-header {
+    padding: 2rem 5rem 0;
+  }
+
+  .admin-layout__body {
+    display: grid;
+    grid-template-columns: 12.5rem minmax(0, 1fr);
+    min-height: calc(100vh - 5.5rem);
+  }
+
+  .admin-navigation {
+    align-self: stretch;
+    gap: 0.75rem;
+    padding: 2.5rem 1.5rem;
+
+    background-color: vars.$color-beige;
+    border-right: 1px solid vars.$color-gold;
+  }
+
+  .admin-navigation__link,
+  .admin-navigation__logout {
+    min-height: 2.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid transparent;
+    font-size: 0.875rem;
+  }
+
+  .admin-navigation__link--active {
+    background-color: vars.$color-cream;
+    border-color: vars.$color-gold;
+  }
+
+  .admin-layout__main {
+    padding: 3rem 5rem 5rem 3rem;
+  }
+}
