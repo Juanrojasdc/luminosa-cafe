@@ -92,7 +92,7 @@
   font-weight: vars.$font-weight-bold;
 }
 
-// Oculta la versión de escritorio en móvil.
+// Versión compacta oculta en móvil
 .footer__schedule-desktop {
   display: none;
 }
@@ -139,6 +139,11 @@
       color: vars.$color-gold;
     }
   }
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-cream;
+    outline-offset: 0.25rem;
+  }
 }
 
 .footer__social-icon {
@@ -150,29 +155,25 @@
   flex-shrink: 0;
 }
 
-.footer__socials a:focus-visible {
-  outline: 2px solid vars.$color-cream;
-  outline-offset: 0.25rem;
-}
-
-// Escritorio
+// Escritorio desde 1024 px
 @include mixins.desktop {
-  .footer {
-    min-height: 6.25rem;
-  }
-
   .footer__inner {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "brand socials"
+      "hours hours";
     align-items: center;
-    min-height: 6.25rem;
-    padding: 0 5rem;
+    column-gap: 2rem;
+    row-gap: 1.5rem;
+    padding: 2rem 5rem;
   }
 
   .footer__brand {
-    align-self: stretch;
+    grid-area: brand;
     display: flex;
     align-items: center;
+    min-width: 0;
     padding: 0;
     border-bottom: 0;
   }
@@ -186,14 +187,15 @@
   }
 
   .footer__signature {
-    font-size: 1.35rem;
+    font-size: 1.2rem;
   }
 
   .footer__stars {
-    font-size: 1.15rem;
+    font-size: 1rem;
   }
 
   .footer__hours {
+    grid-area: hours;
     margin: 0;
     text-align: center;
   }
@@ -202,12 +204,12 @@
     font-size: 0.9375rem;
   }
 
-  // En escritorio ocultamos la lista vertical.
+  // Ocultamos la lista vertical.
   .footer__schedule {
     display: none;
   }
 
-  // Y mostramos la presentación compacta de Figma.
+  // Mostramos los horarios agrupados.
   .footer__schedule-desktop {
     display: block;
     font-family: vars.$font-body;
@@ -218,7 +220,6 @@
 
   .footer__schedule-desktop p {
     margin: 0;
-    white-space: nowrap;
   }
 
   .footer__schedule-desktop strong {
@@ -226,8 +227,9 @@
   }
 
   .footer__socials {
+    grid-area: socials;
     margin: 0;
-    text-align: center;
+    text-align: right;
   }
 
   .footer__socials h2 {
@@ -238,19 +240,62 @@
   }
 
   .footer__socials ul {
-    flex-direction: row;
-    justify-content: center;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
   }
 
   .footer__socials a {
     gap: 0.35rem;
     min-height: auto;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
   }
 
   .footer__social-icon {
     width: 1rem;
     height: 1rem;
+  }
+}
+
+// Escritorio amplio desde 1280 px
+@media (min-width: 1280px) {
+  .footer {
+    min-height: 6.25rem;
+  }
+
+  .footer__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas: "brand hours socials";
+    column-gap: 1.5rem;
+    row-gap: 0;
+    min-height: 6.25rem;
+    padding: 0 5rem;
+  }
+
+  .footer__signature {
+    font-size: 1.35rem;
+  }
+
+  .footer__stars {
+    font-size: 1.15rem;
+  }
+
+  .footer__schedule-desktop p {
+    white-space: nowrap;
+  }
+
+  .footer__socials {
+    text-align: center;
+  }
+
+  .footer__socials ul {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .footer__socials a {
+    font-size: 0.875rem;
   }
 }
