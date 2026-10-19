@@ -33,16 +33,26 @@
 }
 
 .footer__signature {
-  font-family: vars.$font-heading;
-  font-size: 1.25rem;
-  font-weight: vars.$font-weight-regular;
+  font-family:
+    "URW Chancery L", "Apple Chancery", "Palatino Linotype", "Book Antiqua",
+    "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 400;
   font-style: italic;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  text-transform: none;
 }
 
 .footer__stars {
   color: vars.$color-gold;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   line-height: 1;
+
+  .bi {
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
 
 // Horarios
@@ -82,6 +92,11 @@
   font-weight: vars.$font-weight-bold;
 }
 
+// Oculta la versión de escritorio en móvil.
+.footer__schedule-desktop {
+  display: none;
+}
+
 // Redes sociales
 .footer__socials {
   margin-top: 2.5rem;
@@ -114,6 +129,16 @@
   font-size: 0.875rem;
   font-weight: vars.$font-weight-regular;
   text-decoration: none;
+  transition: color 0.25s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: vars.$color-gold;
+
+    .footer__social-icon {
+      color: vars.$color-gold;
+    }
+  }
 }
 
 .footer__social-icon {
@@ -141,8 +166,6 @@
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
     min-height: 6.25rem;
-
-    // Mismo margen lateral que el Header.
     padding: 0 5rem;
   }
 
@@ -163,11 +186,11 @@
   }
 
   .footer__signature {
-    font-size: 1rem;
+    font-size: 1.35rem;
   }
 
   .footer__stars {
-    font-size: 1rem;
+    font-size: 1.15rem;
   }
 
   .footer__hours {
@@ -179,41 +202,27 @@
     font-size: 0.9375rem;
   }
 
+  // En escritorio ocultamos la lista vertical.
   .footer__schedule {
-    display: flex;
-    justify-content: center;
-    gap: 0.35rem;
-  }
-
-  .footer__schedule li {
-    display: contents;
-    font-size: 0.9375rem;
-  }
-
-  .footer__schedule li span:first-child::after {
-    content: ",";
-  }
-
-  .footer__schedule li:not(:last-child) span:last-child::after {
-    content: ",";
-  }
-
-  .footer__schedule .footer__closed span:first-child::after {
-    content: " ·";
-  }
-
-  .footer__schedule .footer__closed strong::after {
-    content: "";
-  }
-
-  .footer__schedule li:nth-child(n + 2):not(.footer__closed) {
     display: none;
   }
 
-  .footer__closed {
-    display: flex;
-    justify-content: center;
-    gap: 0.35rem;
+  // Y mostramos la presentación compacta de Figma.
+  .footer__schedule-desktop {
+    display: block;
+    font-family: vars.$font-body;
+    font-size: 0.9375rem;
+    font-weight: vars.$font-weight-regular;
+    line-height: 1.4;
+  }
+
+  .footer__schedule-desktop p {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .footer__schedule-desktop strong {
+    font-weight: vars.$font-weight-bold;
   }
 
   .footer__socials {
@@ -243,44 +252,5 @@
   .footer__social-icon {
     width: 1rem;
     height: 1rem;
-  }
-}
-
-/* Interacción de los enlaces de redes sociales */
-.footer__socials a {
-  transition: color 0.25s ease;
-
-  &:hover,
-  &:focus-visible {
-    color: #a9854f;
-
-    .footer__social-icon {
-      color: #a9854f;
-    }
-  }
-}
-
-/* Firma caligráfica del Footer */
-.footer__signature {
-  font-family:
-    "URW Chancery L", "Apple Chancery", "Palatino Linotype", "Book Antiqua",
-    "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 1.35rem;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
-  text-transform: none;
-}
-
-/* Destellos decorativos */
-.footer__stars {
-  color: #a9854f;
-  font-size: 1.15rem;
-  line-height: 1;
-
-  .bi {
-    display: inline-block;
-    vertical-align: middle;
   }
 }

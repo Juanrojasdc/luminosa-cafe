@@ -19,6 +19,7 @@ function Footer() {
         <section className="footer__hours" aria-labelledby="footer-hours-title">
           <h2 id="footer-hours-title">HORAIRES</h2>
 
+          {/* Lista completa para móvil */}
           <ul className="footer__schedule">
             <li>
               <span>Lun</span>
@@ -55,6 +56,14 @@ function Footer() {
               <span>10h00–18h00</span>
             </li>
           </ul>
+
+          {/* Presentación compacta para escritorio */}
+          <div className="footer__schedule-desktop" aria-hidden="true">
+            <p>Lun, Mer, Jeu, Ven, Sam, Dim · 10h00–18h00</p>
+            <p>
+              Mar · <strong>Fermé</strong>
+            </p>
+          </div>
         </section>
 
         {/* Redes sociales */}
@@ -77,7 +86,7 @@ function Footer() {
                   aria-hidden="true"
                 ></i>
 
-                <span>Instagram @luminosa.cafe</span>
+                <span>@luminosa.cafe</span>
               </a>
             </li>
 
@@ -93,7 +102,7 @@ function Footer() {
                   aria-hidden="true"
                 ></i>
 
-                <span>TikTok @luminosa.bordeaux</span>
+                <span>@luminosa.bordeaux</span>
               </a>
             </li>
           </ul>
