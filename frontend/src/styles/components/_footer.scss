@@ -245,3 +245,42 @@
     height: 1rem;
   }
 }
+
+/* Interacción de los enlaces de redes sociales */
+.footer__socials a {
+  transition: color 0.25s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: #a9854f;
+
+    .footer__social-icon {
+      color: #a9854f;
+    }
+  }
+}
+
+/* Firma caligráfica del Footer */
+.footer__signature {
+  font-family:
+    "URW Chancery L", "Apple Chancery", "Palatino Linotype", "Book Antiqua",
+    "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.35rem;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  text-transform: none;
+}
+
+/* Destellos decorativos */
+.footer__stars {
+  color: #a9854f;
+  font-size: 1.15rem;
+  line-height: 1;
+
+  .bi {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}

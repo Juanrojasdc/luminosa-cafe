@@ -1,0 +1,106 @@
+@use "../abstracts/variables" as vars;
+@use "../abstracts/mixins" as mixins;
+
+// ========================================
+// PÁGINA 404 - MOBILE FIRST
+// ========================================
+
+.not-found-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 65vh;
+  padding: 4rem vars.$container-padding-mobile;
+
+  background-color: vars.$color-cream;
+  color: vars.$color-brown;
+  text-align: center;
+
+  &__content {
+    width: 100%;
+    max-width: 38rem;
+  }
+
+  &__eyebrow {
+    margin: 0 0 1rem;
+
+    font-family: vars.$font-body;
+    font-size: 0.75rem;
+    font-weight: vars.$font-weight-medium;
+    letter-spacing: 0.12em;
+  }
+
+  &__title {
+    margin: 0;
+
+    font-family: vars.$font-heading;
+    font-size: clamp(6rem, 25vw, 12rem);
+    font-weight: vars.$font-weight-regular;
+    line-height: 1;
+  }
+
+  &__message {
+    max-width: 30rem;
+    margin: 2rem auto;
+
+    font-family: vars.$font-body;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+  }
+
+  &__link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 2.75rem;
+    padding: 0.75rem 1.5rem;
+
+    border: 1px solid vars.$color-brown;
+    background-color: vars.$color-brown;
+    color: vars.$color-cream;
+
+    font-family: vars.$font-body;
+    font-size: 0.875rem;
+    font-weight: vars.$font-weight-medium;
+    text-decoration: none;
+
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover {
+      background-color: vars.$color-gold;
+      border-color: vars.$color-gold;
+      color: vars.$color-cream;
+    }
+
+    &:active {
+      background-color: vars.$color-beige;
+      border-color: vars.$color-beige;
+      color: vars.$color-brown;
+    }
+
+    &:focus-visible {
+      outline: 2px solid vars.$color-gold;
+      outline-offset: 3px;
+    }
+  }
+
+  @include mixins.desktop {
+    min-height: 80vh;
+    padding: 5rem vars.$container-padding-desktop;
+
+    &__message {
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-found-page__link {
+    transition: none;
+  }
+}

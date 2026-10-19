@@ -2,6 +2,7 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer__inner">
+        {/* Identidad de Luminosa */}
         <div className="footer__brand">
           <p className="footer__identity">
             <span className="footer__logo">LUMINOSA</span>
@@ -9,11 +10,12 @@ function Footer() {
             <span className="footer__signature">you are luminous</span>
 
             <span className="footer__stars" aria-hidden="true">
-              ✦✧
+              <i className="bi bi-stars"></i>
             </span>
           </p>
         </div>
 
+        {/* Horarios de apertura */}
         <section className="footer__hours" aria-labelledby="footer-hours-title">
           <h2 id="footer-hours-title">HORAIRES</h2>
 
@@ -55,6 +57,7 @@ function Footer() {
           </ul>
         </section>
 
+        {/* Redes sociales */}
         <section
           className="footer__socials"
           aria-labelledby="footer-socials-title"
@@ -63,20 +66,34 @@ function Footer() {
 
           <ul>
             <li>
-              <a href="#" aria-label="Instagram de Luminosa">
-                <span className="footer__social-icon" aria-hidden="true">
-                  ◎
-                </span>
-                <span>Instagram</span>
+              <a
+                href="https://www.instagram.com/luminosa.cafe/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram de Luminosa (nouvel onglet)"
+              >
+                <i
+                  className="bi bi-instagram footer__social-icon"
+                  aria-hidden="true"
+                ></i>
+
+                <span>Instagram @luminosa.cafe</span>
               </a>
             </li>
 
             <li>
-              <a href="#" aria-label="TikTok de Luminosa">
-                <span className="footer__social-icon" aria-hidden="true">
-                  ♪
-                </span>
-                <span>TikTok</span>
+              <a
+                href="https://www.tiktok.com/@luminosa.bordeaux"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok de Luminosa (nouvel onglet)"
+              >
+                <i
+                  className="bi bi-tiktok footer__social-icon"
+                  aria-hidden="true"
+                ></i>
+
+                <span>TikTok @luminosa.bordeaux</span>
               </a>
             </li>
           </ul>
