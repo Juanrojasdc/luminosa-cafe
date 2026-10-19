@@ -13,8 +13,6 @@ import AdminProductsPage from "./pages/admin/AdminProductsPage.jsx";
 import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage.jsx";
 import AdminEventsPage from "./pages/admin/AdminEventsPage.jsx";
 
-import "./App.css";
-
 function App() {
   return (
     <Routes>
