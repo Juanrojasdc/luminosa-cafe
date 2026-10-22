@@ -3,14 +3,9 @@ function CategoryNavigation({
   activeCategoryId,
   onCategoryChange,
 }) {
-  const sortedCategories = [...categories].sort(
-    (firstCategory, secondCategory) =>
-      firstCategory.displayOrder - secondCategory.displayOrder,
-  );
-
   return (
     <nav className="category-navigation" aria-label="Catégories de la carte">
-      {sortedCategories.map((category) => (
+      {categories.map((category) => (
         <button
           key={category.id}
           className={`category-navigation__button ${

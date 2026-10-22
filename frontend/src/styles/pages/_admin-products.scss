@@ -121,7 +121,8 @@
   }
 
   &__status--unavailable {
-    color: vars.$color-gold;
+    color: vars.$color-brown;
+    font-weight: vars.$font-weight-medium;
   }
 
   // Acciones de edición y eliminación
@@ -429,7 +430,7 @@
   &:not(:disabled):hover {
     background-color: vars.$color-gold;
     border-color: vars.$color-gold;
-    color: vars.$color-cream;
+    color: vars.$color-brown;
   }
 
   &:not(:disabled):active {
@@ -441,7 +442,8 @@
 
 .admin-products__actions button {
   &:hover {
-    color: vars.$color-gold;
+    color: vars.$color-brown;
+    text-decoration-thickness: 2px;
   }
 
   &:active {
