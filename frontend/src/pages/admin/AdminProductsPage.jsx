@@ -25,6 +25,19 @@ function AdminProductsPage() {
 
   const [formKey, setFormKey] = useState(0);
 
+  // Categoría seleccionada para filtrar la lista de productos.
+  // El valor vacío representa todas las categorías.
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+
+  // El filtro afecta únicamente a la visualización.
+  // No modifica ni elimina productos del estado original.
+  const filteredProducts =
+    selectedCategoryId === ""
+      ? products
+      : products.filter(
+          (product) => String(product.categoryId) === selectedCategoryId,
+        );
+
   // Muestra un formulario vacío para crear un producto.
   function handleAddProduct() {
     setSelectedProduct(null);
@@ -180,8 +193,33 @@ function AdminProductsPage() {
           Liste des produits
         </h2>
 
+        {/* Filtro por categoría */}
+        <div className="admin-products__filter">
+          <label htmlFor="admin-products-category-filter">
+            Filtrer par catégorie
+          </label>
+
+          <select
+            id="admin-products-category-filter"
+            value={selectedCategoryId}
+            onChange={(event) => setSelectedCategoryId(event.target.value)}
+          >
+            <option value="">Toutes les catégories</option>
+
+            {categories.map((category) => (
+              <option key={category.id} value={String(category.id)}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {products.length === 0 ? (
           <p className="admin-products__empty">Aucun produit pour le moment.</p>
+        ) : filteredProducts.length === 0 ? (
+          <p className="admin-products__empty">
+            Aucun produit dans cette catégorie.
+          </p>
         ) : (
           <>
             {/* Tabla para escritorio */}
@@ -198,7 +236,7 @@ function AdminProductsPage() {
                 </thead>
 
                 <tbody>
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <tr key={product.id}>
                       <td>{product.name}</td>
 
@@ -244,7 +282,7 @@ function AdminProductsPage() {
 
             {/* Tarjetas para móvil */}
             <div className="admin-products__cards">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <article className="admin-products__card" key={product.id}>
                   <h3>{product.name}</h3>
 

@@ -68,6 +68,40 @@
     font-weight: vars.$font-weight-regular;
   }
 
+  // Filtro de productos por categoría
+
+  &__filter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    margin-bottom: 1.5rem;
+
+    label {
+      font-family: vars.$font-body;
+      font-size: 0.875rem;
+      font-weight: vars.$font-weight-medium;
+    }
+
+    select {
+      width: 100%;
+      min-height: 2.75rem;
+      padding: 0.75rem;
+      border: 1px solid vars.$color-beige;
+      border-radius: 0;
+      background-color: #fff;
+      color: vars.$color-brown;
+      font-family: vars.$font-body;
+      font-size: 1rem;
+      cursor: pointer;
+
+      &:focus-visible {
+        outline: 2px solid vars.$color-gold;
+        outline-offset: 3px;
+      }
+    }
+  }
+
   &__empty {
     padding: 1.5rem;
     background-color: vars.$color-cream;
@@ -158,6 +192,10 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+    }
+
+    &__filter {
+      width: 16rem;
     }
 
     &__table-wrapper {
