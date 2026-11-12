@@ -4,11 +4,11 @@ import Footer from "../components/Footer.jsx";
 
 function PublicLayout() {
   return (
-    <>
+    <div className="public-layout">
       <Header />
       <Outlet />
       <Footer />
-    </>
+    </div>
   );
 }
 
