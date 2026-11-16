@@ -37,12 +37,16 @@ final class AdminCsrfListener
             return;
         }
 
-        $token = $request->headers->get('X-CSRF-Token', '');
+        $token = $request->headers->get('X-CSRF-Token');
 
-        if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('admin_api', $token))) {
-            $event->setResponse(new JsonResponse([
-                'message' => 'Invalid CSRF token',
-            ], JsonResponse::HTTP_FORBIDDEN));
-        }
+        if (
+        !is_string($token)
+        || $token === ''
+        || !$this->csrfTokenManager->isTokenValid(new CsrfToken('admin_api', $token))
+    ) {
+    $event->setResponse(new JsonResponse([
+        'message' => 'Invalid CSRF token',
+    ], JsonResponse::HTTP_FORBIDDEN));
+}
     }
 }
