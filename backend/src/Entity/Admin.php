@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 #[ORM\Table(name: '`admin`')]
-class Admin
+class Admin implements \Symfony\Component\Security\Core\User\UserInterface, \Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -58,6 +58,21 @@ class Admin
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getEmail() ?? '';
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_ADMIN'];
+    }
+
+    public function eraseCredentials(): void
+    {
+    // No almacenamos credenciales temporales que deban eliminarse, por lo que este método puede permanecer vacío.
     }
 
     public function setEmail(string $email): static
