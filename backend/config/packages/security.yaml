@@ -31,6 +31,9 @@ security:
 
             logout:
                 path: /api/admin/logout
+                enable_csrf: true
+                csrf_token_id: admin_api
+                csrf_parameter: _csrf_token
 
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
