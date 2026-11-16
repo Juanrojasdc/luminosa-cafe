@@ -23,7 +23,7 @@ public function me(): JsonResponse
 
     if ($admin === null) {
         return $this->json([
-            'message' => 'No autenticado',
+            'message' => 'Not authenticated',
         ], 401);
     }
 
