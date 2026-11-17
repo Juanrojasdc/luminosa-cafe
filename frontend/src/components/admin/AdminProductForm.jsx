@@ -14,6 +14,7 @@ const initialFormData = {
 
 function AdminProductForm({
   product = null,
+  products = [],
   categories = [],
   foodCharacteristics = [],
   onSubmit,
@@ -38,6 +39,21 @@ function AdminProductForm({
   const [imageName, setImageName] = useState("");
 
   const isEditing = product !== null;
+
+  const categoryProducts = products
+    .filter(
+      (item) =>
+        String(item.categoryId) === String(formData.categoryId) &&
+        item.id !== product?.id,
+    )
+    .sort((a, b) => a.displayOrder - b.displayOrder || a.id - b.id);
+
+  const maximumPosition = categoryProducts.length + 1;
+
+  const selectedPosition =
+    Number(formData.displayOrder) === 0
+      ? maximumPosition
+      : Math.min(Number(formData.displayOrder), maximumPosition);
 
   function handleChange(event) {
     const { name, value, type, checked } = event.target;
@@ -166,15 +182,23 @@ function AdminProductForm({
           <div className="admin-product-form__field">
             <label htmlFor="product-order">Ordre d'affichage</label>
 
-            <input
+            <select
               id="product-order"
               name="displayOrder"
-              type="number"
-              min="0"
-              step="1"
-              value={formData.displayOrder}
+              value={selectedPosition}
               onChange={handleChange}
-            />
+              disabled={!formData.categoryId}
+            >
+              {categoryProducts.map((item, index) => (
+                <option key={item.id} value={index + 1}>
+                  {index + 1} — Avant {item.name}
+                </option>
+              ))}
+
+              <option value={maximumPosition}>
+                {maximumPosition} — À la fin
+              </option>
+            </select>
           </div>
 
           <fieldset className="admin-product-form__fieldset">
@@ -206,16 +230,24 @@ function AdminProductForm({
             <legend>Options du produit</legend>
 
             <div className="admin-product-form__options">
-              <label className="admin-product-form__checkbox">
-                <input
-                  type="checkbox"
-                  name="isAvailable"
-                  checked={formData.isAvailable}
-                  onChange={handleChange}
-                />
+              <div className="admin-product-form__field">
+                <label htmlFor="product-availability">Disponibilité</label>
 
-                <span>Disponible</span>
-              </label>
+                <select
+                  id="product-availability"
+                  name="isAvailable"
+                  value={String(formData.isAvailable)}
+                  onChange={(event) =>
+                    setFormData((previousData) => ({
+                      ...previousData,
+                      isAvailable: event.target.value === "true",
+                    }))
+                  }
+                >
+                  <option value="true">Disponible</option>
+                  <option value="false">Indisponible</option>
+                </select>
+              </div>
 
               <label className="admin-product-form__checkbox">
                 <input

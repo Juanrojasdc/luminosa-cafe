@@ -12,7 +12,14 @@ final class ProductController extends AbstractController
     #[Route('/api/products', name: 'api_products', methods: ['GET'])]
     public function index(ProductRepository $productRepository): JsonResponse
     {
-        $products = $productRepository->findBy([], ['displayOrder' => 'ASC']);
+        $products = $productRepository->findBy(
+    [],
+    [
+        'category' => 'ASC',
+        'displayOrder' => 'ASC',
+        'id' => 'ASC',
+    ]
+);
 
         $data = [];
 

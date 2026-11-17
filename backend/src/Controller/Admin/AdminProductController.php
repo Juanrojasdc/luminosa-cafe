@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Category;
 use App\Entity\Product;
 use App\Repository\CategoryRepository;
 use App\Repository\FoodCharacteristicRepository;
@@ -20,13 +21,15 @@ final class AdminProductController extends AbstractController
         Request $request,
         CategoryRepository $categories,
         FoodCharacteristicRepository $characteristics,
+        ProductRepository $products,
         EntityManagerInterface $entityManager
     ): JsonResponse {
         $product = new Product();
+        $data = $request->toArray();
 
         $error = $this->fillProduct(
             $product,
-            $request->toArray(),
+            $data,
             $categories,
             $characteristics
         );
@@ -35,8 +38,18 @@ final class AdminProductController extends AbstractController
             return $this->json(['message' => $error], 422);
         }
 
+        $position = $product->getDisplayOrder();
+
         $entityManager->persist($product);
         $entityManager->flush();
+
+        $this->reorderCategory(
+            $product->getCategory(),
+            $products,
+            $entityManager,
+            $product,
+            $position
+        );
 
         return $this->json([
             'id' => $product->getId(),
@@ -59,6 +72,8 @@ final class AdminProductController extends AbstractController
             return $this->json(['message' => 'Product not found'], 404);
         }
 
+        $oldCategory = $product->getCategory();
+
         $error = $this->fillProduct(
             $product,
             $request->toArray(),
@@ -70,7 +85,26 @@ final class AdminProductController extends AbstractController
             return $this->json(['message' => $error], 422);
         }
 
+        $position = $product->getDisplayOrder();
+        $newCategory = $product->getCategory();
+
         $entityManager->flush();
+
+        if ($oldCategory->getId() !== $newCategory->getId()) {
+            $this->reorderCategory(
+                $oldCategory,
+                $products,
+                $entityManager
+            );
+        }
+
+        $this->reorderCategory(
+            $newCategory,
+            $products,
+            $entityManager,
+            $product,
+            $position
+        );
 
         return $this->json([
             'id' => $product->getId(),
@@ -90,12 +124,67 @@ final class AdminProductController extends AbstractController
             return $this->json(['message' => 'Product not found'], 404);
         }
 
+        $category = $product->getCategory();
+
         $entityManager->remove($product);
         $entityManager->flush();
+
+        $this->reorderCategory(
+            $category,
+            $products,
+            $entityManager
+        );
 
         return $this->json([
             'message' => 'Product deleted successfully',
         ]);
+    }
+
+    /**
+     * Reorganiza los productos de una categoría.
+     *
+     * Si se proporciona un producto, lo coloca en la posición solicitada.
+     * En todos los casos, guarda posiciones consecutivas desde 1.
+     */
+    private function reorderCategory(
+        Category $category,
+        ProductRepository $products,
+        EntityManagerInterface $entityManager,
+        ?Product $movingProduct = null,
+        int $position = 0
+    ): void {
+        $orderedProducts = $products->findBy(
+            ['category' => $category],
+            ['displayOrder' => 'ASC', 'id' => 'ASC']
+        );
+
+        if ($movingProduct !== null) {
+            $orderedProducts = array_values(
+                array_filter(
+                    $orderedProducts,
+                    fn (Product $product): bool =>
+                        $product->getId() !== $movingProduct->getId()
+                )
+            );
+
+            // La posición 0 significa añadir al final.
+            $index = $position === 0
+                ? count($orderedProducts)
+                : min($position - 1, count($orderedProducts));
+
+            array_splice(
+                $orderedProducts,
+                $index,
+                0,
+                [$movingProduct]
+            );
+        }
+
+        foreach ($orderedProducts as $index => $product) {
+            $product->setDisplayOrder($index + 1);
+        }
+
+        $entityManager->flush();
     }
 
     private function fillProduct(
@@ -175,8 +264,7 @@ final class AdminProductController extends AbstractController
             $selectedCharacteristics[] = $characteristic;
         }
 
-        // La subida de archivos se implementará por separado.
-        // No aceptamos rutas de imagen arbitrarias desde el cliente.
+        // D.6 gestionará la subida de imágenes.
         if (array_key_exists('image', $data) && $data['image'] !== null) {
             return 'Image upload is not yet supported';
         }

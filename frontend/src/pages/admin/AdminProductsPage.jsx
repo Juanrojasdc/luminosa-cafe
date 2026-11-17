@@ -389,6 +389,7 @@ function AdminProductsPage() {
         <AdminProductForm
           key={formKey}
           product={selectedProduct}
+          products={products}
           categories={categories}
           foodCharacteristics={foodCharacteristics}
           onSubmit={handleSaveProduct}
