@@ -84,7 +84,7 @@ function AdminProductForm({
 
     onSubmit({
       ...formData,
-      price: Number(formData.price),
+      price: formData.price,
       categoryId: Number(formData.categoryId),
       displayOrder: Number(formData.displayOrder),
     });

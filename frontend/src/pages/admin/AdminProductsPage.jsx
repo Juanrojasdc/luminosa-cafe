@@ -1,36 +1,80 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import AdminProductForm from "../../components/admin/AdminProductForm";
 import ConfirmDelete from "../../components/admin/ConfirmDelete";
+import { apiRequest, adminRequest } from "../../services/api";
 
-import {
-  categories,
-  foodCharacteristics,
-  products as initialProducts,
-} from "../../data/menuData";
-
-// Formato de precios utilizado en la administración.
 const priceFormatter = new Intl.NumberFormat("fr-FR", {
   style: "currency",
   currency: "EUR",
 });
 
 function AdminProductsPage() {
-  // Los datos se gestionan temporalmente en React.
-  // Symfony sustituirá esta lógica cuando esté disponible la API.
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [foodCharacteristics, setFoodCharacteristics] = useState([]);
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productToDelete, setProductToDelete] = useState(null);
-
-  const [formKey, setFormKey] = useState(0);
-
-  // Categoría seleccionada para filtrar la lista de productos.
-  // El valor vacío representa todas las categorías.
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
-  // El filtro afecta únicamente a la visualización.
-  // No modifica ni elimina productos del estado original.
+  const [formKey, setFormKey] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  // Adapta la respuesta Symfony al formato del formulario React.
+  function normalizeProduct(product) {
+    return {
+      ...product,
+      categoryId: product.category.id,
+      foodCharacteristicIds: product.foodCharacteristics.map(
+        (characteristic) => characteristic.id,
+      ),
+    };
+  }
+
+  async function loadProducts() {
+    const data = await apiRequest("/products");
+    setProducts(data.map(normalizeProduct));
+  }
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadData() {
+      try {
+        const [productsData, categoriesData, characteristicsData] =
+          await Promise.all([
+            apiRequest("/products"),
+            apiRequest("/categories"),
+            apiRequest("/food-characteristics"),
+          ]);
+
+        if (!active) return;
+
+        setProducts(productsData.map(normalizeProduct));
+        setCategories(categoriesData);
+        setFoodCharacteristics(characteristicsData);
+      } catch (err) {
+        if (active) {
+          setError(err.message);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadData();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const filteredProducts =
     selectedCategoryId === ""
       ? products
@@ -38,118 +82,126 @@ function AdminProductsPage() {
           (product) => String(product.categoryId) === selectedCategoryId,
         );
 
-  // Muestra un formulario vacío para crear un producto.
+  function scrollToForm() {
+    document.getElementById("admin-product-form-title")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
   function handleAddProduct() {
     setSelectedProduct(null);
     setProductToDelete(null);
-    setFormKey((previousKey) => previousKey + 1);
-
-    document.getElementById("admin-product-form-title")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    setMessage("");
+    setError("");
+    setFormKey((key) => key + 1);
+    scrollToForm();
   }
 
-  // Carga los datos del producto seleccionado en el formulario.
   function handleEditProduct(product) {
-    setSelectedProduct({
-      ...product,
-      foodCharacteristicIds: product.foodCharacteristics.map(
-        (characteristic) => characteristic.id,
-      ),
-    });
-
+    setSelectedProduct(product);
     setProductToDelete(null);
-    setFormKey((previousKey) => previousKey + 1);
-
-    document.getElementById("admin-product-form-title")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    setMessage("");
+    setError("");
+    setFormKey((key) => key + 1);
+    scrollToForm();
   }
 
-  // Crea o modifica un producto en el estado local.
-  function handleSaveProduct(formData) {
-    const selectedCharacteristics = foodCharacteristics.filter(
-      (characteristic) =>
-        formData.foodCharacteristicIds.includes(characteristic.id),
-    );
+  async function handleSaveProduct(formData) {
+    if (saving) return;
 
-    const productData = {
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-      price: formData.price,
-      categoryId: formData.categoryId,
-      foodCharacteristics: selectedCharacteristics,
-      isAvailable: formData.isAvailable,
-      isFeatured: formData.isFeatured,
-      displayOrder: formData.displayOrder,
-    };
+    setSaving(true);
+    setError("");
+    setMessage("");
 
-    if (selectedProduct) {
-      // Edición: conservamos la imagen si no se elige otra.
-      const updatedProduct = {
-        ...productData,
-        id: selectedProduct.id,
-        image: formData.image
-          ? URL.createObjectURL(formData.image)
-          : selectedProduct.image,
+    try {
+      if (formData.image) {
+        throw new Error(
+          "L'envoi d'images n'est pas encore disponible. Enregistrez le produit sans sélectionner de fichier.",
+        );
+      }
+
+      const payload = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        price: formData.price,
+        image: null,
+        categoryId: formData.categoryId,
+        foodCharacteristicIds: formData.foodCharacteristicIds,
+        isAvailable: formData.isAvailable,
+        isFeatured: formData.isFeatured,
+        displayOrder: formData.displayOrder,
       };
 
-      setProducts((previousProducts) =>
-        previousProducts.map((product) =>
-          product.id === selectedProduct.id ? updatedProduct : product,
-        ),
+      const isEditing = selectedProduct !== null;
+
+      await adminRequest(
+        isEditing ? `/products/${selectedProduct.id}` : "/products",
+        {
+          method: isEditing ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
       );
-    } else {
-      // Creación: asignamos un identificador local provisional.
-      const newProduct = {
-        ...productData,
-        id: Math.max(0, ...products.map((product) => product.id)) + 1,
-        image: formData.image ? URL.createObjectURL(formData.image) : null,
-      };
 
-      setProducts((previousProducts) => [...previousProducts, newProduct]);
+      await loadProducts();
+
+      setSelectedProduct(null);
+      setFormKey((key) => key + 1);
+      setMessage(
+        isEditing
+          ? "Le produit a été modifié avec succès."
+          : "Le produit a été créé avec succès.",
+      );
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
     }
-
-    setSelectedProduct(null);
-    setFormKey((previousKey) => previousKey + 1);
   }
 
-  // Cancela la edición y devuelve el formulario a su estado inicial.
   function handleCancelEdit() {
     setSelectedProduct(null);
-    setFormKey((previousKey) => previousKey + 1);
+    setFormKey((key) => key + 1);
   }
 
-  // Solicita confirmación antes de eliminar.
   function handleRequestDelete(product) {
     setProductToDelete(product);
+    setMessage("");
+    setError("");
   }
 
-  // Elimina el producto únicamente después de confirmar.
-  function handleConfirmDelete() {
-    if (!productToDelete) {
-      return;
+  async function handleConfirmDelete() {
+    if (!productToDelete || saving) return;
+
+    setSaving(true);
+    setError("");
+
+    try {
+      await adminRequest(`/products/${productToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      await loadProducts();
+
+      if (selectedProduct?.id === productToDelete.id) {
+        setSelectedProduct(null);
+        setFormKey((key) => key + 1);
+      }
+
+      setProductToDelete(null);
+      setMessage("Le produit a été supprimé avec succès.");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
     }
-
-    setProducts((previousProducts) =>
-      previousProducts.filter((product) => product.id !== productToDelete.id),
-    );
-
-    if (selectedProduct?.id === productToDelete.id) {
-      setSelectedProduct(null);
-      setFormKey((previousKey) => previousKey + 1);
-    }
-
-    setProductToDelete(null);
   }
 
   function handleCancelDelete() {
     setProductToDelete(null);
   }
 
-  // Recupera el nombre de la categoría asociada al producto.
   function getCategoryName(categoryId) {
     return (
       categories.find((category) => category.id === categoryId)?.name ??
@@ -159,11 +211,9 @@ function AdminProductsPage() {
 
   return (
     <div className="admin-products">
-      {/* Encabezado de la página */}
       <div className="admin-products__header">
         <div>
           <h1>Produits</h1>
-
           <p className="admin-products__intro">
             Gérez les produits affichés sur la carte du café.
           </p>
@@ -173,18 +223,24 @@ function AdminProductsPage() {
           type="button"
           className="admin-products__add-button"
           onClick={handleAddProduct}
+          disabled={loading || saving}
         >
           Ajouter un produit
         </button>
       </div>
 
-      {/* Información sobre los datos temporales */}
-      <p className="admin-products__notice">
-        Mode démonstration : les modifications ne sont pas encore enregistrées
-        dans la base de données.
-      </p>
+      {message && (
+        <p className="admin-products__notice" role="status">
+          {message}
+        </p>
+      )}
 
-      {/* Lista de productos */}
+      {error && (
+        <p className="admin-products__notice" role="alert">
+          {error}
+        </p>
+      )}
+
       <section
         className="admin-products__list"
         aria-labelledby="admin-products-list-title"
@@ -193,7 +249,6 @@ function AdminProductsPage() {
           Liste des produits
         </h2>
 
-        {/* Filtro por categoría */}
         <div className="admin-products__filter">
           <label htmlFor="admin-products-category-filter">
             Filtrer par catégorie
@@ -214,7 +269,9 @@ function AdminProductsPage() {
           </select>
         </div>
 
-        {products.length === 0 ? (
+        {loading ? (
+          <p role="status">Chargement des produits...</p>
+        ) : products.length === 0 ? (
           <p className="admin-products__empty">Aucun produit pour le moment.</p>
         ) : filteredProducts.length === 0 ? (
           <p className="admin-products__empty">
@@ -222,7 +279,6 @@ function AdminProductsPage() {
           </p>
         ) : (
           <>
-            {/* Tabla para escritorio */}
             <div className="admin-products__table-wrapper">
               <table className="admin-products__table">
                 <thead>
@@ -239,11 +295,8 @@ function AdminProductsPage() {
                   {filteredProducts.map((product) => (
                     <tr key={product.id}>
                       <td>{product.name}</td>
-
                       <td>{getCategoryName(product.categoryId)}</td>
-
-                      <td>{priceFormatter.format(product.price)}</td>
-
+                      <td>{priceFormatter.format(Number(product.price))}</td>
                       <td>
                         <span
                           className={
@@ -255,20 +308,20 @@ function AdminProductsPage() {
                           {product.isAvailable ? "Disponible" : "Indisponible"}
                         </span>
                       </td>
-
                       <td>
                         <div className="admin-products__actions">
                           <button
                             type="button"
                             onClick={() => handleEditProduct(product)}
+                            disabled={saving}
                           >
                             Modifier
                           </button>
-
                           <button
                             type="button"
                             className="admin-products__delete-button"
                             onClick={() => handleRequestDelete(product)}
+                            disabled={saving}
                           >
                             Supprimer
                           </button>
@@ -280,7 +333,6 @@ function AdminProductsPage() {
               </table>
             </div>
 
-            {/* Tarjetas para móvil */}
             <div className="admin-products__cards">
               {filteredProducts.map((product) => (
                 <article className="admin-products__card" key={product.id}>
@@ -293,7 +345,7 @@ function AdminProductsPage() {
 
                   <p>
                     <strong>Prix :</strong>{" "}
-                    {priceFormatter.format(product.price)}
+                    {priceFormatter.format(Number(product.price))}
                   </p>
 
                   <p>
@@ -305,14 +357,15 @@ function AdminProductsPage() {
                     <button
                       type="button"
                       onClick={() => handleEditProduct(product)}
+                      disabled={saving}
                     >
                       Modifier
                     </button>
-
                     <button
                       type="button"
                       className="admin-products__delete-button"
                       onClick={() => handleRequestDelete(product)}
+                      disabled={saving}
                     >
                       Supprimer
                     </button>
@@ -324,7 +377,6 @@ function AdminProductsPage() {
         )}
       </section>
 
-      {/* Confirmación de eliminación */}
       {productToDelete && (
         <ConfirmDelete
           itemName={productToDelete.name}
@@ -333,15 +385,16 @@ function AdminProductsPage() {
         />
       )}
 
-      {/* Formulario de creación y edición */}
-      <AdminProductForm
-        key={formKey}
-        product={selectedProduct}
-        categories={categories}
-        foodCharacteristics={foodCharacteristics}
-        onSubmit={handleSaveProduct}
-        onCancel={handleCancelEdit}
-      />
+      {!loading && (
+        <AdminProductForm
+          key={formKey}
+          product={selectedProduct}
+          categories={categories}
+          foodCharacteristics={foodCharacteristics}
+          onSubmit={handleSaveProduct}
+          onCancel={handleCancelEdit}
+        />
+      )}
     </div>
   );
 }
