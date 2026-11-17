@@ -40,16 +40,23 @@ final class AdminProductController extends AbstractController
 
         $position = $product->getDisplayOrder();
 
-        $entityManager->persist($product);
-        $entityManager->flush();
+         $entityManager->wrapInTransaction(function () use (
+            $entityManager,
+            $products,
+            $product,
+            $position
+        ): void {
+            $entityManager->persist($product);
+            $entityManager->flush();
 
-        $this->reorderCategory(
+            $this->reorderCategory(
             $product->getCategory(),
             $products,
             $entityManager,
             $product,
             $position
         );
+         });
 
         return $this->json([
             'id' => $product->getId(),
@@ -88,23 +95,32 @@ final class AdminProductController extends AbstractController
         $position = $product->getDisplayOrder();
         $newCategory = $product->getCategory();
 
-        $entityManager->flush();
-
-        if ($oldCategory->getId() !== $newCategory->getId()) {
-            $this->reorderCategory(
-                $oldCategory,
-                $products,
-                $entityManager
-            );
-        }
-
-        $this->reorderCategory(
-            $newCategory,
-            $products,
+        $entityManager->wrapInTransaction(function () use (
             $entityManager,
+            $products,
             $product,
+            $oldCategory,
+            $newCategory,
             $position
-        );
+        ): void {
+            $entityManager->flush();
+
+            if ($oldCategory->getId() !== $newCategory->getId()) {
+                $this->reorderCategory(
+                    $oldCategory,
+                    $products,
+                    $entityManager
+                );
+            }
+
+            $this->reorderCategory(
+                $newCategory,
+                $products,
+                $entityManager,
+                $product,
+                $position
+            );
+        });
 
         return $this->json([
             'id' => $product->getId(),
@@ -126,14 +142,21 @@ final class AdminProductController extends AbstractController
 
         $category = $product->getCategory();
 
-        $entityManager->remove($product);
-        $entityManager->flush();
-
-        $this->reorderCategory(
-            $category,
+        $entityManager->wrapInTransaction(function () use (
+            $entityManager,
             $products,
-            $entityManager
-        );
+            $product,
+            $category
+        ): void {
+            $entityManager->remove($product);
+            $entityManager->flush();
+
+            $this->reorderCategory(
+                $category,
+                $products,
+                $entityManager
+            );
+        });
 
         return $this->json([
             'message' => 'Product deleted successfully',
