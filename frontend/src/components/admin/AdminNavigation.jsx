@@ -1,6 +1,27 @@
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+
+import { logout } from "../../services/api.js";
 
 function AdminNavigation() {
+  const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+    setError("");
+
+    try {
+      await logout();
+      navigate("/admin/login", { replace: true });
+    } catch {
+      setError("Impossible de se déconnecter. Veuillez réessayer.");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
+
   return (
     <nav className="admin-navigation" aria-label="Navigation administrative">
       <NavLink
@@ -33,11 +54,13 @@ function AdminNavigation() {
       <button
         type="button"
         className="admin-navigation__logout"
-        disabled
-        title="Disponible après l'intégration de l'authentification"
+        onClick={handleLogout}
+        disabled={isLoggingOut}
       >
-        Déconnexion
+        {isLoggingOut ? "Déconnexion..." : "Déconnexion"}
       </button>
+
+      {error && <p role="alert">{error}</p>}
     </nav>
   );
 }

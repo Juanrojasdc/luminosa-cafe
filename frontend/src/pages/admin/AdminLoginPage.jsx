@@ -1,13 +1,31 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../services/api.js";
 
 function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
-    // La autenticación se conectará al backend Symfony.
+    try {
+      await login(email, password);
+      navigate("/admin/products", { replace: true });
+    } catch (error) {
+      setError(
+        error.status === 401
+          ? "Email ou mot de passe incorrect."
+          : "Impossible de se connecter au serveur.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -54,13 +72,18 @@ function AdminLoginPage() {
               />
             </div>
 
+            {error && (
+              <p className="admin-login__error" role="alert">
+                {error}
+              </p>
+            )}
+
             <button
               className="admin-login__submit"
               type="submit"
-              disabled
-              title="Disponible après l'intégration de l'authentification"
+              disabled={isSubmitting}
             >
-              Se connecter
+              {isSubmitting ? "Connexion..." : "Se connecter"}
             </button>
           </form>
         </section>
