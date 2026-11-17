@@ -1,143 +1,173 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import AdminCategoryForm from "../../components/admin/AdminCategoryForm";
 import ConfirmDelete from "../../components/admin/ConfirmDelete";
-
-import { categories as initialCategories, products } from "../../data/menuData";
+import { adminRequest, apiRequest } from "../../services/api.js";
 
 function AdminCategoriesPage() {
-  // Datos temporales para probar la administración.
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const [formKey, setFormKey] = useState(0);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Prepara un formulario vacío.
+  async function loadData() {
+    const [categoriesData, productsData] = await Promise.all([
+      apiRequest("/categories"),
+      apiRequest("/products"),
+    ]);
+
+    setCategories(categoriesData);
+    setProducts(productsData);
+  }
+
+  useEffect(() => {
+    let active = true;
+
+    Promise.all([apiRequest("/categories"), apiRequest("/products")])
+      .then(([categoriesData, productsData]) => {
+        if (!active) return;
+        setCategories(categoriesData);
+        setProducts(productsData);
+      })
+      .catch(() => {
+        if (active) {
+          setError("Impossible de charger les catégories.");
+        }
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   function handleAddCategory() {
     setSelectedCategory(null);
     setCategoryToDelete(null);
     setMessage("");
-    setFormKey((previousKey) => previousKey + 1);
+    setError("");
+    setFormKey((key) => key + 1);
   }
 
-  // Selecciona una categoría para modificarla.
   function handleEditCategory(category) {
     setSelectedCategory(category);
     setCategoryToDelete(null);
     setMessage("");
-    setFormKey((previousKey) => previousKey + 1);
+    setError("");
+    setFormKey((key) => key + 1);
   }
 
-  // Crea o actualiza una categoría en React.
-  function handleSaveCategory(formData) {
+  async function handleSaveCategory(formData) {
+    setMessage("");
+    setError("");
+
+    if (formData.image instanceof File) {
+      setError("L'envoi d'images n'est pas encore disponible.");
+      return;
+    }
+
     const categoryData = {
       name: formData.name,
       description: formData.description,
       displayOrder: formData.displayOrder,
+      image: selectedCategory?.image ?? null,
     };
 
-    if (selectedCategory) {
-      const updatedCategory = {
-        ...categoryData,
-        id: selectedCategory.id,
-        image: formData.image
-          ? URL.createObjectURL(formData.image)
-          : selectedCategory.image,
-      };
+    const isEditing = selectedCategory !== null;
 
-      setCategories((previousCategories) =>
-        previousCategories.map((category) =>
-          category.id === selectedCategory.id ? updatedCategory : category,
-        ),
+    try {
+      await adminRequest(
+        isEditing ? `/categories/${selectedCategory.id}` : "/categories",
+        {
+          method: isEditing ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(categoryData),
+        },
       );
 
-      setMessage("La catégorie a été modifiée (mode démonstration).");
-    } else {
-      const newCategory = {
-        ...categoryData,
-        id: Math.max(0, ...categories.map((category) => category.id)) + 1,
-        image: formData.image ? URL.createObjectURL(formData.image) : null,
-      };
+      await loadData();
 
-      setCategories((previousCategories) => [
-        ...previousCategories,
-        newCategory,
-      ]);
+      setSelectedCategory(null);
+      setFormKey((key) => key + 1);
 
-      setMessage("La catégorie a été ajoutée (mode démonstration).");
+      setMessage(
+        isEditing
+          ? "La catégorie a été modifiée."
+          : "La catégorie a été ajoutée.",
+      );
+    } catch (requestError) {
+      setError(requestError.message);
     }
-
-    setSelectedCategory(null);
-    setFormKey((previousKey) => previousKey + 1);
   }
 
   function handleCancelEdit() {
     setSelectedCategory(null);
-    setFormKey((previousKey) => previousKey + 1);
+    setFormKey((key) => key + 1);
   }
 
-  // Verifica si una categoría tiene productos asociados.
   function getProductCount(categoryId) {
-    return products.filter((product) => product.categoryId === categoryId)
+    return products.filter((product) => product.category?.id === categoryId)
       .length;
   }
 
-  // Solicita confirmación antes de eliminar.
   function handleRequestDelete(category) {
     setMessage("");
-
-    if (getProductCount(category.id) > 0) {
-      setCategoryToDelete(null);
-      setMessage(
-        `Impossible de supprimer « ${category.name} » : des produits sont associés à cette catégorie.`,
-      );
-      return;
-    }
-
+    setError("");
     setCategoryToDelete(category);
   }
 
-  // Elimina una categoría después de la confirmación.
-  function handleConfirmDelete() {
-    if (!categoryToDelete) {
-      return;
+  async function handleConfirmDelete() {
+    if (!categoryToDelete) return;
+
+    setMessage("");
+    setError("");
+
+    try {
+      await adminRequest(`/categories/${categoryToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      await loadData();
+
+      if (selectedCategory?.id === categoryToDelete.id) {
+        setSelectedCategory(null);
+        setFormKey((key) => key + 1);
+      }
+
+      setCategoryToDelete(null);
+      setMessage("La catégorie a été supprimée.");
+    } catch (requestError) {
+      setCategoryToDelete(null);
+
+      setError(
+        requestError.status === 409
+          ? "Impossible de supprimer cette catégorie : des produits y sont associés."
+          : requestError.message,
+      );
     }
-
-    setCategories((previousCategories) =>
-      previousCategories.filter(
-        (category) => category.id !== categoryToDelete.id,
-      ),
-    );
-
-    if (selectedCategory?.id === categoryToDelete.id) {
-      setSelectedCategory(null);
-      setFormKey((previousKey) => previousKey + 1);
-    }
-
-    setMessage("La catégorie a été supprimée (mode démonstration).");
-    setCategoryToDelete(null);
   }
 
   function handleCancelDelete() {
     setCategoryToDelete(null);
   }
 
-  // Presenta las categorías según su orden de visualización.
   const sortedCategories = [...categories].sort(
-    (firstCategory, secondCategory) =>
-      firstCategory.displayOrder - secondCategory.displayOrder,
+    (a, b) => a.displayOrder - b.displayOrder,
   );
 
   return (
     <div className="admin-categories">
-      {/* Encabezado */}
       <div className="admin-categories__header">
         <div>
           <h1>Catégories</h1>
-
           <p className="admin-categories__intro">
             Gérez les catégories de la carte du café.
           </p>
@@ -152,18 +182,18 @@ function AdminCategoriesPage() {
         </button>
       </div>
 
-      <p className="admin-categories__notice">
-        Mode démonstration : les modifications ne sont pas encore enregistrées
-        dans la base de données.
-      </p>
-
       {message && (
         <p className="admin-categories__message" role="status">
           {message}
         </p>
       )}
 
-      {/* Lista de categorías */}
+      {error && (
+        <p className="admin-categories__message" role="alert">
+          {error}
+        </p>
+      )}
+
       <section
         className="admin-categories__list"
         aria-labelledby="admin-categories-list-title"
@@ -175,13 +205,14 @@ function AdminCategoriesPage() {
           Liste des catégories
         </h2>
 
-        {sortedCategories.length === 0 ? (
+        {isLoading ? (
+          <p role="status">Chargement des catégories...</p>
+        ) : sortedCategories.length === 0 ? (
           <p className="admin-categories__empty">
             Aucune catégorie pour le moment.
           </p>
         ) : (
           <>
-            {/* Tabla de escritorio */}
             <div className="admin-categories__table-wrapper">
               <table className="admin-categories__table">
                 <thead>
@@ -201,7 +232,6 @@ function AdminCategoriesPage() {
                       <td>{category.description || "—"}</td>
                       <td>{category.displayOrder}</td>
                       <td>{getProductCount(category.id)}</td>
-
                       <td>
                         <div className="admin-categories__actions">
                           <button
@@ -210,7 +240,6 @@ function AdminCategoriesPage() {
                           >
                             Modifier
                           </button>
-
                           <button
                             type="button"
                             onClick={() => handleRequestDelete(category)}
@@ -225,18 +254,14 @@ function AdminCategoriesPage() {
               </table>
             </div>
 
-            {/* Tarjetas móviles */}
             <div className="admin-categories__cards">
               {sortedCategories.map((category) => (
                 <article key={category.id} className="admin-categories__card">
                   <h3>{category.name}</h3>
-
                   <p>{category.description || "Sans description"}</p>
-
                   <p>
                     <strong>Ordre :</strong> {category.displayOrder}
                   </p>
-
                   <p>
                     <strong>Produits :</strong> {getProductCount(category.id)}
                   </p>
@@ -248,7 +273,6 @@ function AdminCategoriesPage() {
                     >
                       Modifier
                     </button>
-
                     <button
                       type="button"
                       onClick={() => handleRequestDelete(category)}
@@ -263,7 +287,6 @@ function AdminCategoriesPage() {
         )}
       </section>
 
-      {/* Confirmación de eliminación */}
       {categoryToDelete && (
         <ConfirmDelete
           itemName={categoryToDelete.name}
@@ -272,7 +295,6 @@ function AdminCategoriesPage() {
         />
       )}
 
-      {/* Formulario */}
       <AdminCategoryForm
         key={formKey}
         category={selectedCategory}
