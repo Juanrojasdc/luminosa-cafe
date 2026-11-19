@@ -287,6 +287,7 @@ function AdminProductsPage() {
                     <th scope="col">Catégorie</th>
                     <th scope="col">Prix</th>
                     <th scope="col">Disponibilité</th>
+                    <th scope="col">Description</th>
                     <th scope="col">Actions</th>
                   </tr>
                 </thead>
@@ -308,6 +309,7 @@ function AdminProductsPage() {
                           {product.isAvailable ? "Disponible" : "Indisponible"}
                         </span>
                       </td>
+                      <td>{product.description}</td>
                       <td>
                         <div className="admin-products__actions">
                           <button
@@ -337,6 +339,7 @@ function AdminProductsPage() {
               {filteredProducts.map((product) => (
                 <article className="admin-products__card" key={product.id}>
                   <h3>{product.name}</h3>
+                  <p>{product.description}</p>
 
                   <p>
                     <strong>Catégorie :</strong>{" "}

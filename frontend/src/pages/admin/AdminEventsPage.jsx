@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import AdminEventForm from "../../components/admin/AdminEventForm";
 import ConfirmDelete from "../../components/admin/ConfirmDelete";
+import { apiRequest, adminRequest } from "../../services/api";
 
-import { events as initialEvents } from "../../data/eventsData";
-
-// Formato de fechas para la administración.
 const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
   day: "2-digit",
   month: "long",
@@ -17,108 +15,177 @@ function formatEventDate(date) {
   return dateFormatter.format(new Date(`${date}T12:00:00Z`));
 }
 
-function AdminEventsPage() {
-  // Datos temporales hasta conectar la API Symfony.
-  const [events, setEvents] = useState(initialEvents);
+// Symfony devuelve "eventDate", mientras que el formulario utiliza "date".
+function normalizeEvent(event) {
+  return {
+    ...event,
+    date: event.eventDate,
+  };
+}
 
+function AdminEventsPage() {
+  const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventToDelete, setEventToDelete] = useState(null);
 
   const [formKey, setFormKey] = useState(0);
-  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Prepara un formulario vacío para crear un evento.
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  // Recupera los eventos almacenados en MySQL mediante Symfony.
+  async function loadEvents() {
+    const data = await apiRequest("/events");
+    setEvents(data.map(normalizeEvent));
+  }
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadInitialEvents() {
+      try {
+        const data = await apiRequest("/events");
+
+        if (active) {
+          setEvents(data.map(normalizeEvent));
+        }
+      } catch (requestError) {
+        if (active) {
+          setError(requestError.message);
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadInitialEvents();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   function handleAddEvent() {
     setSelectedEvent(null);
     setEventToDelete(null);
     setMessage("");
+    setError("");
     setFormKey((previousKey) => previousKey + 1);
   }
 
-  // Carga los datos del evento seleccionado.
   function handleEditEvent(event) {
     setSelectedEvent(event);
     setEventToDelete(null);
     setMessage("");
+    setError("");
     setFormKey((previousKey) => previousKey + 1);
   }
 
-  // Crea o modifica un evento en el estado local.
-  function handleSaveEvent(formData) {
-    const eventData = {
-      title: formData.title,
-      description: formData.description,
-      date: formData.date,
-      startTime: formData.startTime,
-      endTime: formData.endTime,
-    };
+  // Envía el formulario a Symfony para crear o modificar un evento.
+  async function handleSaveEvent(formData) {
+    if (isSaving) return;
 
-    if (selectedEvent) {
-      const updatedEvent = {
-        ...eventData,
-        id: selectedEvent.id,
-        image: formData.image
-          ? URL.createObjectURL(formData.image)
-          : selectedEvent.image,
+    setIsSaving(true);
+    setMessage("");
+    setError("");
+
+    try {
+      if (formData.image instanceof File) {
+        throw new Error(
+          "L'envoi d'images n'est pas encore disponible. Enregistrez l'événement sans sélectionner de fichier.",
+        );
+      }
+
+      const payload = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        eventDate: formData.date,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
       };
 
-      setEvents((previousEvents) =>
-        previousEvents.map((event) =>
-          event.id === selectedEvent.id ? updatedEvent : event,
-        ),
+      const isEditing = selectedEvent !== null;
+
+      await adminRequest(
+        isEditing ? `/events/${selectedEvent.id}` : "/events",
+        {
+          method: isEditing ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        },
       );
 
-      setMessage("L'événement a été modifié (mode démonstration).");
-    } else {
-      const newEvent = {
-        ...eventData,
-        id: Math.max(0, ...events.map((event) => event.id)) + 1,
-        image: formData.image ? URL.createObjectURL(formData.image) : null,
-      };
+      await loadEvents();
 
-      setEvents((previousEvents) => [...previousEvents, newEvent]);
+      setSelectedEvent(null);
+      setFormKey((previousKey) => previousKey + 1);
 
-      setMessage("L'événement a été ajouté (mode démonstration).");
+      setMessage(
+        isEditing
+          ? "L'événement a été modifié avec succès."
+          : "L'événement a été ajouté avec succès.",
+      );
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsSaving(false);
     }
-
-    setSelectedEvent(null);
-    setFormKey((previousKey) => previousKey + 1);
   }
 
   function handleCancelEdit() {
+    if (isSaving) return;
+
     setSelectedEvent(null);
     setFormKey((previousKey) => previousKey + 1);
   }
 
-  // La eliminación siempre requiere una confirmación.
   function handleRequestDelete(event) {
+    if (isSaving) return;
+
     setEventToDelete(event);
     setMessage("");
+    setError("");
   }
 
-  function handleConfirmDelete() {
-    if (!eventToDelete) {
-      return;
+  async function handleConfirmDelete() {
+    if (!eventToDelete || isSaving) return;
+
+    setIsSaving(true);
+    setMessage("");
+    setError("");
+
+    try {
+      await adminRequest(`/events/${eventToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      await loadEvents();
+
+      if (selectedEvent?.id === eventToDelete.id) {
+        setSelectedEvent(null);
+        setFormKey((previousKey) => previousKey + 1);
+      }
+
+      setEventToDelete(null);
+      setMessage("L'événement a été supprimé avec succès.");
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsSaving(false);
     }
-
-    setEvents((previousEvents) =>
-      previousEvents.filter((event) => event.id !== eventToDelete.id),
-    );
-
-    if (selectedEvent?.id === eventToDelete.id) {
-      setSelectedEvent(null);
-      setFormKey((previousKey) => previousKey + 1);
-    }
-
-    setEventToDelete(null);
-    setMessage("L'événement a été supprimé (mode démonstration).");
   }
 
   function handleCancelDelete() {
+    if (isSaving) return;
     setEventToDelete(null);
   }
 
-  // Orden cronológico: primero los eventos más próximos.
   const sortedEvents = [...events].sort((firstEvent, secondEvent) => {
     const firstDateTime = `${firstEvent.date}T${firstEvent.startTime}`;
     const secondDateTime = `${secondEvent.date}T${secondEvent.startTime}`;
@@ -128,7 +195,6 @@ function AdminEventsPage() {
 
   return (
     <div className="admin-events">
-      {/* Encabezado */}
       <div className="admin-events__header">
         <div>
           <h1>Événements</h1>
@@ -142,15 +208,11 @@ function AdminEventsPage() {
           type="button"
           className="admin-events__add-button"
           onClick={handleAddEvent}
+          disabled={isLoading || isSaving}
         >
           Ajouter un événement
         </button>
       </div>
-
-      <p className="admin-events__notice">
-        Mode démonstration : les modifications ne sont pas encore enregistrées
-        dans la base de données.
-      </p>
 
       {message && (
         <p className="admin-events__message" role="status">
@@ -158,7 +220,8 @@ function AdminEventsPage() {
         </p>
       )}
 
-      {/* Listado de eventos */}
+      {error && <p role="alert">{error}</p>}
+
       <section
         className="admin-events__list"
         aria-labelledby="admin-events-list-title"
@@ -167,17 +230,19 @@ function AdminEventsPage() {
           Liste des événements
         </h2>
 
-        {sortedEvents.length === 0 ? (
+        {isLoading ? (
+          <p role="status">Chargement des événements...</p>
+        ) : sortedEvents.length === 0 ? (
           <p className="admin-events__empty">Aucun événement pour le moment.</p>
         ) : (
           <>
-            {/* Tabla de escritorio */}
             <div className="admin-events__table-wrapper">
               <table className="admin-events__table">
                 <thead>
                   <tr>
                     <th scope="col">Événement</th>
                     <th scope="col">Date</th>
+                    <th scope="col">Description</th>
                     <th scope="col">Horaires</th>
                     <th scope="col">Actions</th>
                   </tr>
@@ -187,18 +252,17 @@ function AdminEventsPage() {
                   {sortedEvents.map((event) => (
                     <tr key={event.id}>
                       <td>{event.title}</td>
-
+                      <td>{event.description}</td>
                       <td>{formatEventDate(event.date)}</td>
-
                       <td>
                         {event.startTime} – {event.endTime}
                       </td>
-
                       <td>
                         <div className="admin-events__actions">
                           <button
                             type="button"
                             onClick={() => handleEditEvent(event)}
+                            disabled={isSaving}
                           >
                             Modifier
                           </button>
@@ -206,6 +270,7 @@ function AdminEventsPage() {
                           <button
                             type="button"
                             onClick={() => handleRequestDelete(event)}
+                            disabled={isSaving}
                           >
                             Supprimer
                           </button>
@@ -217,12 +282,11 @@ function AdminEventsPage() {
               </table>
             </div>
 
-            {/* Tarjetas móviles */}
             <div className="admin-events__cards">
               {sortedEvents.map((event) => (
                 <article key={event.id} className="admin-events__card">
                   <h3>{event.title}</h3>
-
+                  <p>{event.description}</p>
                   <p>
                     <strong>Date :</strong> {formatEventDate(event.date)}
                   </p>
@@ -236,6 +300,7 @@ function AdminEventsPage() {
                     <button
                       type="button"
                       onClick={() => handleEditEvent(event)}
+                      disabled={isSaving}
                     >
                       Modifier
                     </button>
@@ -243,6 +308,7 @@ function AdminEventsPage() {
                     <button
                       type="button"
                       onClick={() => handleRequestDelete(event)}
+                      disabled={isSaving}
                     >
                       Supprimer
                     </button>
@@ -254,22 +320,23 @@ function AdminEventsPage() {
         )}
       </section>
 
-      {/* Confirmación de eliminación */}
       {eventToDelete && (
         <ConfirmDelete
           itemName={eventToDelete.title}
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
+          isDeleting={isSaving}
         />
       )}
 
-      {/* Formulario de creación y edición */}
-      <AdminEventForm
-        key={formKey}
-        event={selectedEvent}
-        onSubmit={handleSaveEvent}
-        onCancel={handleCancelEdit}
-      />
+      {!isLoading && (
+        <AdminEventForm
+          key={formKey}
+          event={selectedEvent}
+          onSubmit={handleSaveEvent}
+          onCancel={handleCancelEdit}
+        />
+      )}
     </div>
   );
 }
