@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import AdminProductForm from "../../components/admin/AdminProductForm";
 import ConfirmDelete from "../../components/admin/ConfirmDelete";
-import { apiRequest, adminRequest } from "../../services/api";
+import { apiRequest, adminRequest, uploadImage } from "../../services/api";
 
 const priceFormatter = new Intl.NumberFormat("fr-FR", {
   style: "currency",
@@ -23,6 +23,7 @@ function AdminProductsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   // Adapta la respuesta Symfony al formato del formulario React.
   function normalizeProduct(product) {
@@ -94,6 +95,7 @@ function AdminProductsPage() {
     setProductToDelete(null);
     setMessage("");
     setError("");
+    setSaveError("");
     setFormKey((key) => key + 1);
     scrollToForm();
   }
@@ -103,6 +105,7 @@ function AdminProductsPage() {
     setProductToDelete(null);
     setMessage("");
     setError("");
+    setSaveError("");
     setFormKey((key) => key + 1);
     scrollToForm();
   }
@@ -111,21 +114,22 @@ function AdminProductsPage() {
     if (saving) return;
 
     setSaving(true);
-    setError("");
+    setSaveError("");
     setMessage("");
 
     try {
-      if (formData.image) {
-        throw new Error(
-          "L'envoi d'images n'est pas encore disponible. Enregistrez le produit sans sélectionner de fichier.",
-        );
+      let imagePath = null;
+
+      if (formData.image instanceof File) {
+        const result = await uploadImage(formData.image);
+        imagePath = result.image;
       }
 
       const payload = {
         name: formData.name.trim(),
         description: formData.description.trim(),
         price: formData.price,
-        image: null,
+        image: imagePath,
         categoryId: formData.categoryId,
         foodCharacteristicIds: formData.foodCharacteristicIds,
         isAvailable: formData.isAvailable,
@@ -154,21 +158,27 @@ function AdminProductsPage() {
           : "Le produit a été créé avec succès.",
       );
     } catch (err) {
-      setError(err.message);
+      setSaveError(err.message);
     } finally {
       setSaving(false);
     }
   }
 
   function handleCancelEdit() {
+    if (saving) return;
+
     setSelectedProduct(null);
+    setSaveError("");
     setFormKey((key) => key + 1);
   }
 
   function handleRequestDelete(product) {
+    if (saving) return;
+
     setProductToDelete(product);
     setMessage("");
     setError("");
+    setSaveError("");
   }
 
   async function handleConfirmDelete() {
@@ -199,6 +209,8 @@ function AdminProductsPage() {
   }
 
   function handleCancelDelete() {
+    if (saving) return;
+
     setProductToDelete(null);
   }
 
@@ -397,6 +409,8 @@ function AdminProductsPage() {
           foodCharacteristics={foodCharacteristics}
           onSubmit={handleSaveProduct}
           onCancel={handleCancelEdit}
+          error={saveError}
+          isSaving={saving}
         />
       )}
     </div>

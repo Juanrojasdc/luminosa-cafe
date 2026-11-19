@@ -19,6 +19,8 @@ function AdminProductForm({
   foodCharacteristics = [],
   onSubmit,
   onCancel,
+  error = "",
+  isSaving = false,
 }) {
   const [formData, setFormData] = useState(() => ({
     ...initialFormData,
@@ -94,7 +96,7 @@ function AdminProductForm({
   function handleSubmit(event) {
     event.preventDefault();
 
-    if (typeof onSubmit !== "function") {
+    if (typeof onSubmit !== "function" || isSaving) {
       return;
     }
 
@@ -286,8 +288,18 @@ function AdminProductForm({
           </div>
         </div>
 
+        {error && (
+          <p className="admin-product-form__error" role="alert">
+            {error}
+          </p>
+        )}
+
         <div className="admin-product-form__actions">
-          <button className="admin-product-form__submit" type="submit">
+          <button
+            className="admin-product-form__submit"
+            type="submit"
+            disabled={isSaving}
+          >
             Enregistrer
           </button>
 
@@ -296,6 +308,7 @@ function AdminProductForm({
               className="admin-product-form__cancel"
               type="button"
               onClick={onCancel}
+              disabled={isSaving}
             >
               Annuler
             </button>

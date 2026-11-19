@@ -8,6 +8,8 @@ backend/var/
 backend/.env.local
 backend/.env.*.local
 
+/backend/public/uploads/*
+
 # Environment
 .env
 .env.local

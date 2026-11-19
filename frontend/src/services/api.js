@@ -62,3 +62,12 @@ export async function logout() {
     }).toString(),
   });
 }
+export function uploadImage(file) {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  return adminRequest("/images", {
+    method: "POST",
+    body: formData,
+  });
+}

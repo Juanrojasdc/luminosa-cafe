@@ -7,6 +7,7 @@ use App\Entity\Product;
 use App\Repository\CategoryRepository;
 use App\Repository\FoodCharacteristicRepository;
 use App\Repository\ProductRepository;
+use App\Service\ImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,6 +23,7 @@ final class AdminProductController extends AbstractController
         CategoryRepository $categories,
         FoodCharacteristicRepository $characteristics,
         ProductRepository $products,
+        ImageUploader $imageUploader,
         EntityManagerInterface $entityManager
     ): JsonResponse {
         $product = new Product();
@@ -31,7 +33,8 @@ final class AdminProductController extends AbstractController
             $product,
             $data,
             $categories,
-            $characteristics
+            $characteristics,
+            $imageUploader
         );
 
         if ($error !== null) {
@@ -70,6 +73,7 @@ final class AdminProductController extends AbstractController
         Request $request,
         ProductRepository $products,
         CategoryRepository $categories,
+        ImageUploader $imageUploader,
         FoodCharacteristicRepository $characteristics,
         EntityManagerInterface $entityManager
     ): JsonResponse {
@@ -85,7 +89,8 @@ final class AdminProductController extends AbstractController
             $product,
             $request->toArray(),
             $categories,
-            $characteristics
+            $characteristics,
+            $imageUploader
         );
 
         if ($error !== null) {
@@ -214,7 +219,8 @@ final class AdminProductController extends AbstractController
         Product $product,
         array $data,
         CategoryRepository $categories,
-        FoodCharacteristicRepository $characteristics
+        FoodCharacteristicRepository $characteristics,
+        ImageUploader $imageUploader
     ): ?string {
         $name = $data['name'] ?? null;
         $description = $data['description'] ?? null;
@@ -287,10 +293,16 @@ final class AdminProductController extends AbstractController
             $selectedCharacteristics[] = $characteristic;
         }
 
-        // D.6 gestionará la subida de imágenes.
-        if (array_key_exists('image', $data) && $data['image'] !== null) {
-            return 'Image upload is not yet supported';
-        }
+            if (array_key_exists('image', $data) && $data['image'] !== null) {
+                if (
+                    !is_string($data['image'])
+                    || !$imageUploader->isValidPath($data['image'])
+                ) {
+                    return 'Invalid image path';
+                }
+
+                $product->setImage($data['image']);
+            }
 
         $product
             ->setName(trim($name))

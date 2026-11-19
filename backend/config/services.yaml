@@ -29,3 +29,6 @@ services:
                   method: __invoke,
                   priority: 0,
               }
+    App\Service\ImageUploader:
+        arguments:
+            $projectDir: "%kernel.project_dir%"

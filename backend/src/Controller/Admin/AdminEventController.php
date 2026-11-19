@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Event;
 use App\Repository\EventRepository;
+use App\Service\ImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,11 +17,12 @@ final class AdminEventController extends AbstractController
     #[Route('', name: 'api_admin_events_create', methods: ['POST'])]
     public function create(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ImageUploader $imageUploader
     ): JsonResponse {
         $event = new Event();
 
-        $error = $this->fillEvent($event, $request->toArray());
+        $error = $this->fillEvent($event, $request->toArray(), $imageUploader);
 
         if ($error !== null) {
             return $this->json(['message' => $error], 422);
@@ -40,7 +42,8 @@ final class AdminEventController extends AbstractController
         int $id,
         Request $request,
         EventRepository $events,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ImageUploader $imageUploader
     ): JsonResponse {
         $event = $events->find($id);
 
@@ -48,7 +51,7 @@ final class AdminEventController extends AbstractController
             return $this->json(['message' => 'Event not found'], 404);
         }
 
-        $error = $this->fillEvent($event, $request->toArray());
+        $error = $this->fillEvent($event, $request->toArray(), $imageUploader);
 
         if ($error !== null) {
             return $this->json(['message' => $error], 422);
@@ -82,7 +85,7 @@ final class AdminEventController extends AbstractController
         ]);
     }
 
-    private function fillEvent(Event $event, array $data): ?string
+    private function fillEvent(Event $event, array $data, ImageUploader $imageUploader): ?string
     {
         $title = $data['title'] ?? null;
         $description = $data['description'] ?? null;
@@ -131,10 +134,15 @@ final class AdminEventController extends AbstractController
             return 'End time must be later than start time';
         }
 
-        // La subida de imágenes se implementará por separado.
-        // En una actualización conservamos la imagen existente.
         if (array_key_exists('image', $data) && $data['image'] !== null) {
-            return 'Image upload is not yet supported';
+            if (
+                !is_string($data['image'])
+                || !$imageUploader->isValidPath($data['image'])
+            ) {
+                return 'Invalid image path';
+            }
+
+            $event->setImage($data['image']);
         }
 
         $event

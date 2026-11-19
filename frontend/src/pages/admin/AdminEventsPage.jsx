@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import AdminEventForm from "../../components/admin/AdminEventForm";
 import ConfirmDelete from "../../components/admin/ConfirmDelete";
-import { apiRequest, adminRequest } from "../../services/api";
+import { apiRequest, adminRequest, uploadImage } from "../../services/api";
 
 const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
   day: "2-digit",
@@ -34,6 +34,7 @@ function AdminEventsPage() {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   // Recupera los eventos almacenados en MySQL mediante Symfony.
   async function loadEvents() {
@@ -74,6 +75,7 @@ function AdminEventsPage() {
     setEventToDelete(null);
     setMessage("");
     setError("");
+    setSaveError("");
     setFormKey((previousKey) => previousKey + 1);
   }
 
@@ -82,6 +84,7 @@ function AdminEventsPage() {
     setEventToDelete(null);
     setMessage("");
     setError("");
+    setSaveError("");
     setFormKey((previousKey) => previousKey + 1);
   }
 
@@ -91,13 +94,14 @@ function AdminEventsPage() {
 
     setIsSaving(true);
     setMessage("");
-    setError("");
+    setSaveError("");
 
     try {
+      let imagePath = null;
+
       if (formData.image instanceof File) {
-        throw new Error(
-          "L'envoi d'images n'est pas encore disponible. Enregistrez l'événement sans sélectionner de fichier.",
-        );
+        const result = await uploadImage(formData.image);
+        imagePath = result.image;
       }
 
       const payload = {
@@ -106,6 +110,7 @@ function AdminEventsPage() {
         eventDate: formData.date,
         startTime: formData.startTime,
         endTime: formData.endTime,
+        image: imagePath,
       };
 
       const isEditing = selectedEvent !== null;
@@ -132,7 +137,7 @@ function AdminEventsPage() {
           : "L'événement a été ajouté avec succès.",
       );
     } catch (requestError) {
-      setError(requestError.message);
+      setSaveError(requestError.message);
     } finally {
       setIsSaving(false);
     }
@@ -142,6 +147,7 @@ function AdminEventsPage() {
     if (isSaving) return;
 
     setSelectedEvent(null);
+    setSaveError("");
     setFormKey((previousKey) => previousKey + 1);
   }
 
@@ -220,7 +226,11 @@ function AdminEventsPage() {
         </p>
       )}
 
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <p className="admin-events__error" role="alert">
+          {error}
+        </p>
+      )}
 
       <section
         className="admin-events__list"
@@ -252,8 +262,8 @@ function AdminEventsPage() {
                   {sortedEvents.map((event) => (
                     <tr key={event.id}>
                       <td>{event.title}</td>
-                      <td>{event.description}</td>
                       <td>{formatEventDate(event.date)}</td>
+                      <td>{event.description}</td>
                       <td>
                         {event.startTime} – {event.endTime}
                       </td>
@@ -335,6 +345,8 @@ function AdminEventsPage() {
           event={selectedEvent}
           onSubmit={handleSaveEvent}
           onCancel={handleCancelEdit}
+          error={saveError}
+          isSaving={isSaving}
         />
       )}
     </div>

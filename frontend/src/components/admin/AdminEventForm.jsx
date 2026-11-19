@@ -9,7 +9,13 @@ const initialFormData = {
   image: null,
 };
 
-function AdminEventForm({ event = null, onSubmit, onCancel }) {
+function AdminEventForm({
+  event = null,
+  onSubmit,
+  onCancel,
+  error = "",
+  isSaving = false,
+}) {
   // Inicializamos el formulario con los datos del evento seleccionado.
   const [formData, setFormData] = useState(() => ({
     ...initialFormData,
@@ -25,7 +31,7 @@ function AdminEventForm({ event = null, onSubmit, onCancel }) {
   }));
 
   const [imageName, setImageName] = useState("");
-  const [error, setError] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   const isEditing = event !== null;
 
@@ -38,7 +44,7 @@ function AdminEventForm({ event = null, onSubmit, onCancel }) {
       [name]: value,
     }));
 
-    setError("");
+    setValidationError("");
   }
 
   // Conservamos el archivo seleccionado para enviarlo después a Symfony.
@@ -57,7 +63,9 @@ function AdminEventForm({ event = null, onSubmit, onCancel }) {
     submitEvent.preventDefault();
 
     if (formData.endTime <= formData.startTime) {
-      setError("L'heure de fin doit être postérieure à l'heure de début.");
+      setValidationError(
+        "L'heure de fin doit être postérieure à l'heure de début.",
+      );
       return;
     }
 
@@ -176,14 +184,18 @@ function AdminEventForm({ event = null, onSubmit, onCancel }) {
           </div>
         </div>
 
-        {error && (
+        {(validationError || error) && (
           <p className="admin-event-form__error" role="alert">
-            {error}
+            {validationError || error}
           </p>
         )}
 
         <div className="admin-event-form__actions">
-          <button className="admin-event-form__submit" type="submit">
+          <button
+            className="admin-event-form__submit"
+            type="submit"
+            disabled={isSaving}
+          >
             Enregistrer
           </button>
 
