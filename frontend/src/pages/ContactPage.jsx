@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { sendContactMessage } from "../services/api";
 
 function ContactPage() {
   // Estados del formulario.
@@ -6,10 +7,12 @@ function ContactPage() {
   const [feedback, setFeedback] = useState("");
 
   // Prepara los datos para enviarlos posteriormente a Symfony.
-  function handleSubmit(event) {
+
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
     const contactData = {
       name: formData.get("name").trim(),
@@ -18,19 +21,28 @@ function ContactPage() {
       message: formData.get("message").trim(),
     };
 
-    // Validación adicional: no aceptar campos con solo espacios.
     if (Object.values(contactData).some((value) => !value)) {
       setStatus("error");
       setFeedback("Veuillez remplir tous les champs du formulaire.");
       return;
     }
 
-    // El envío real se implementará con fetch() y Symfony.
-    // Por ahora no simulamos un correo enviado correctamente.
-    setStatus("error");
-    setFeedback(
-      "Le service de contact n'est pas encore disponible. Veuillez réessayer ultérieurement.",
-    );
+    setStatus("loading");
+    setFeedback("");
+
+    try {
+      const response = await sendContactMessage(contactData);
+
+      setStatus("success");
+      setFeedback(response.message);
+      form.reset();
+    } catch (error) {
+      setStatus("error");
+      setFeedback(
+        error.message ||
+          "Le service de contact est temporairement indisponible.",
+      );
+    }
   }
 
   return (
