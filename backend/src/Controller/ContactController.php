@@ -16,12 +16,19 @@ final class ContactController
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
+
+        #[Autowire(service: 'monolog.logger.security')]
+        private readonly LoggerInterface $securityLogger,
+
         #[Autowire('%env(RESEND_API_KEY)%')]
         private readonly string $resendApiKey,
+
         #[Autowire('%env(CONTACT_FROM_EMAIL)%')]
         private readonly string $fromEmail,
+
         #[Autowire('%env(CONTACT_TO_EMAIL)%')]
         private readonly string $toEmail,
+
         #[Autowire(service: 'limiter.contact')]
         private readonly RateLimiterFactory $contactLimiter,
     ) {
@@ -30,6 +37,7 @@ final class ContactController
     #[Route('/api/contact', name: 'api_contact', methods: ['POST'])]
     public function send(Request $request): JsonResponse
     {
+        // Décodage des données JSON envoyées par le frontend.
         $data = json_decode($request->getContent(), true);
 
         if (!is_array($data)) {
@@ -38,6 +46,7 @@ final class ContactController
             ], 400);
         }
 
+        // Validation des champs obligatoires et de leur longueur.
         $limits = [
             'name' => 100,
             'email' => 254,
@@ -61,6 +70,7 @@ final class ContactController
             }
         }
 
+        // Validation de l'adresse email côté serveur.
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             return new JsonResponse([
                 'message' => 'Veuillez saisir une adresse email valide.',
@@ -75,11 +85,17 @@ final class ContactController
         $limit = $limiter->consume(1);
 
         if (!$limit->isAccepted()) {
+            // Journalisation du blocage sans données personnelles.
+            $this->securityLogger->warning(
+                'Formulaire de contact : limite de requêtes atteinte.'
+            );
+
             return new JsonResponse([
                 'message' => 'Trop de messages envoyés. Veuillez réessayer plus tard.',
             ], 429);
         }
 
+        // Construction du contenu du message.
         $message = sprintf(
             "Nom : %s\nEmail : %s\nSujet : %s\n\nMessage :\n%s",
             $data['name'],
@@ -89,6 +105,7 @@ final class ContactController
         );
 
         try {
+            // Envoi du message via l'API Resend.
             $response = $this->httpClient->request(
                 'POST',
                 'https://api.resend.com/emails',
@@ -110,10 +127,11 @@ final class ContactController
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
 
+            // Vérification de la réponse du fournisseur.
             if ($statusCode !== 200 || empty($result['id'])) {
+                // Seul le statut HTTP est enregistré.
                 $this->logger->warning('Resend a refusé un message.', [
                     'http_status' => $statusCode,
-                    'provider_message' => $result['message'] ?? 'Aucun détail',
                 ]);
 
                 return new JsonResponse([
@@ -121,8 +139,9 @@ final class ContactController
                 ], 502);
             }
         } catch (TransportExceptionInterface $exception) {
+            // Journalisation sans exposer le contenu de l'exception.
             $this->logger->error('Erreur de connexion à Resend.', [
-                'error' => $exception->getMessage(),
+                'error_type' => get_class($exception),
             ]);
 
             return new JsonResponse([
@@ -138,6 +157,7 @@ final class ContactController
             ], 503);
         }
 
+        // Confirmation de l'envoi du message.
         return new JsonResponse([
             'message' => 'Votre message a bien été envoyé.',
         ]);
