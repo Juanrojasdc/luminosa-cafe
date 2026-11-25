@@ -46,12 +46,12 @@
   position: absolute;
   z-index: 10;
   top: 100%;
-  right: 0;
-  left: 0;
+  right: calc(-1 * vars.$container-padding-mobile);
+  left: calc(-1 * vars.$container-padding-mobile);
   display: none;
   flex-direction: column;
   gap: 1.5rem;
-  padding: 1.5rem 0;
+  padding: 1.5rem vars.$container-padding-mobile;
   background-color: vars.$color-cream;
   font-family: vars.$font-body;
   font-size: vars.$font-size-nav-mobile;
@@ -116,6 +116,12 @@
 // Tablet
 @include mixins.tablet {
   .header {
+    padding-inline: vars.$container-padding-desktop;
+  }
+
+  .header__nav {
+    right: calc(-1 * vars.$container-padding-desktop);
+    left: calc(-1 * vars.$container-padding-desktop);
     padding-inline: vars.$container-padding-desktop;
   }
 }
