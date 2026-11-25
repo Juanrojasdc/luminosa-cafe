@@ -36,15 +36,11 @@ function ProductCard({ product }) {
           </span>
 
           {product.foodCharacteristics.length > 0 && (
-            <>
-              <span aria-hidden="true"> · </span>
-
-              <span className="product-card__characteristics">
-                {product.foodCharacteristics
-                  .map((characteristic) => characteristic.name)
-                  .join(", ")}
-              </span>
-            </>
+            <span className="product-card__characteristics">
+              {product.foodCharacteristics
+                .map((characteristic) => characteristic.name)
+                .join(", ")}
+            </span>
           )}
         </div>
       </div>

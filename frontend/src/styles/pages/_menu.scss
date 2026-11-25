@@ -68,7 +68,7 @@
   color: vars.$color-brown;
 
   font-family: vars.$font-body;
-  font-size: 0.75rem;
+  font-size: 0.9375rem;
   font-weight: vars.$font-weight-regular;
   line-height: 1.2;
 
@@ -89,10 +89,12 @@
 }
 
 // Hover: se aplica también a la categoría seleccionada.
-.category-navigation__button:hover {
-  border-color: vars.$color-gold;
-  background-color: vars.$color-gold;
-  color: vars.$color-brown;
+@media (hover: hover) {
+  .category-navigation__button:hover {
+    border-color: vars.$color-gold;
+    background-color: vars.$color-gold;
+    color: vars.$color-brown;
+  }
 }
 
 // Active: mientras se mantiene pulsado el botón.
@@ -201,13 +203,17 @@
   margin: 1rem 0 0;
 
   font-family: vars.$font-body;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: vars.$font-weight-regular;
   line-height: 1.4;
 }
 
 .product-card__details {
   margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 
   font-family: vars.$font-body;
   font-size: 0.75rem;
@@ -215,7 +221,19 @@
   line-height: 1.4;
 }
 
+.product-card__availability,
+.product-card__characteristics {
+  font-weight: vars.$font-weight-semibold;
+}
+
+.product-card__availability {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid vars.$color-brown;
+}
+
 .product-card__availability--unavailable {
+  background-color: vars.$color-brown;
+  color: vars.$color-cream;
   font-weight: vars.$font-weight-bold;
 }
 
@@ -266,6 +284,7 @@
 
   .category-navigation__button {
     min-width: 7rem;
+    font-size: vars.$font-size-button;
   }
 
   .menu-page__category {
