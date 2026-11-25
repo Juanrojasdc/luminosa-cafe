@@ -25,6 +25,7 @@ function CardImage({ src, alt, className, placeholderClassName }) {
       src={src}
       alt={alt}
       loading="lazy"
+      decoding="async"
       onError={() => setFailedSrc(src)}
     />
   );

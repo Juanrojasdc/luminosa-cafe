@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import PublicLayout from "./layouts/PublicLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
@@ -15,6 +16,19 @@ import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage.jsx";
 import AdminEventsPage from "./pages/admin/AdminEventsPage.jsx";
 
 function App() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const titles = {
+      "/": "Luminosa — Cafétéria à Bordeaux",
+      "/menu": "La carte | Luminosa",
+      "/events": "Événements | Luminosa",
+      "/contact": "Contact | Luminosa",
+    };
+
+    document.title = titles[pathname] ?? "Luminosa";
+  }, [pathname]);
+
   return (
     <Routes>
       {/* Páginas públicas */}

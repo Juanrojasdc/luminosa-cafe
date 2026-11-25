@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import homeInterior from "../assets/img/home-interior.png";
-import homeSign from "../assets/img/home-sign.jpg";
+import homeInterior from "../assets/img/home-interior.webp";
+import homeSign from "../assets/img/home-sign.webp";
 
 function HomePage() {
   return (
@@ -29,6 +29,8 @@ function HomePage() {
           className="home-hero__image"
           src={homeInterior}
           alt="Intérieur de la cafétéria Luminosa à Bordeaux"
+          fetchPriority="high"
+          decoding="async"
         />
 
         <div className="home-hero__mobile-actions">
@@ -59,6 +61,8 @@ function HomePage() {
           className="home-about__image"
           src={homeSign}
           alt="Enseigne Luminosa à Bordeaux"
+          loading="lazy"
+          decoding="async"
         />
       </section>
     </main>
