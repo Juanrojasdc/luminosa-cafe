@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import AdminCategoryForm from "../../components/admin/AdminCategoryForm";
+import AdminNotification from "../../components/admin/AdminNotification";
 import ConfirmDelete from "../../components/admin/ConfirmDelete";
 import { adminRequest, apiRequest } from "../../services/api.js";
 
@@ -206,17 +207,12 @@ function AdminCategoriesPage() {
         </button>
       </div>
 
-      {message && (
-        <p className="admin-categories__message" role="status">
-          {message}
-        </p>
-      )}
-
-      {error && (
-        <p className="admin-categories__message" role="alert">
-          {error}
-        </p>
-      )}
+      <AdminNotification
+        message={message}
+        error={error}
+        onCloseMessage={() => setMessage("")}
+        onCloseError={() => setError("")}
+      />
 
       <section
         className="admin-categories__list"

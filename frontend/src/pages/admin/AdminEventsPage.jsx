@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import AdminEventForm from "../../components/admin/AdminEventForm";
+import AdminNotification from "../../components/admin/AdminNotification";
 import ConfirmDelete from "../../components/admin/ConfirmDelete";
 import { apiRequest, adminRequest, uploadImage } from "../../services/api";
 
@@ -251,17 +252,12 @@ function AdminEventsPage() {
         </button>
       </div>
 
-      {message && (
-        <p className="admin-events__message" role="status">
-          {message}
-        </p>
-      )}
-
-      {error && (
-        <p className="admin-events__error" role="alert">
-          {error}
-        </p>
-      )}
+      <AdminNotification
+        message={message}
+        error={error}
+        onCloseMessage={() => setMessage("")}
+        onCloseError={() => setError("")}
+      />
 
       <section
         className="admin-events__list"

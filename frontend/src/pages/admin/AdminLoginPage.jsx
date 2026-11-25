@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/api.js";
 
@@ -8,9 +8,12 @@ function AdminLoginPage() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setError("");
     setIsSubmitting(true);
 
@@ -20,10 +23,11 @@ function AdminLoginPage() {
     } catch (error) {
       setError(
         error.status === 401
-          ? "Email ou mot de passe incorrect."
+          ? "Connexion refusée. Vérifiez vos identifiants ou réessayez plus tard après plusieurs tentatives."
           : "Impossible de se connecter au serveur.",
       );
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   }
