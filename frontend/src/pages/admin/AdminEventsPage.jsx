@@ -30,6 +30,7 @@ function AdminEventsPage() {
 
   const [formKey, setFormKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [message, setMessage] = useState("");
@@ -39,6 +40,9 @@ function AdminEventsPage() {
   // Recupera los eventos almacenados en MySQL mediante Symfony.
   async function loadEvents() {
     const data = await apiRequest("/events");
+    if (!Array.isArray(data)) {
+      throw new Error("Format des données des événements inattendu.");
+    }
     setEvents(data.map(normalizeEvent));
   }
 
@@ -49,11 +53,16 @@ function AdminEventsPage() {
       try {
         const data = await apiRequest("/events");
 
+        if (!Array.isArray(data)) {
+          throw new Error("Format des données des événements inattendu.");
+        }
+
         if (active) {
           setEvents(data.map(normalizeEvent));
         }
       } catch (requestError) {
         if (active) {
+          setLoadFailed(true);
           setError(requestError.message);
         }
       } finally {
@@ -95,6 +104,7 @@ function AdminEventsPage() {
     setIsSaving(true);
     setMessage("");
     setSaveError("");
+    let saved = false;
 
     try {
       let imagePath = null;
@@ -111,6 +121,7 @@ function AdminEventsPage() {
         startTime: formData.startTime,
         endTime: formData.endTime,
         image: imagePath,
+        removeImage: formData.removeImage,
       };
 
       const isEditing = selectedEvent !== null;
@@ -126,6 +137,8 @@ function AdminEventsPage() {
         },
       );
 
+      saved = true;
+
       await loadEvents();
 
       setSelectedEvent(null);
@@ -137,7 +150,13 @@ function AdminEventsPage() {
           : "L'événement a été ajouté avec succès.",
       );
     } catch (requestError) {
-      setSaveError(requestError.message);
+      if (saved) {
+        setSelectedEvent(null);
+        setFormKey((previousKey) => previousKey + 1);
+        setMessage("L'événement a été enregistré, mais la liste n'a pas pu être actualisée. Rechargez la page.");
+      } else {
+        setSaveError(requestError.message);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -165,11 +184,14 @@ function AdminEventsPage() {
     setIsSaving(true);
     setMessage("");
     setError("");
+    let deleted = false;
 
     try {
       await adminRequest(`/events/${eventToDelete.id}`, {
         method: "DELETE",
       });
+
+      deleted = true;
 
       await loadEvents();
 
@@ -181,7 +203,16 @@ function AdminEventsPage() {
       setEventToDelete(null);
       setMessage("L'événement a été supprimé avec succès.");
     } catch (requestError) {
-      setError(requestError.message);
+      if (deleted) {
+        if (selectedEvent?.id === eventToDelete.id) {
+          setSelectedEvent(null);
+          setFormKey((previousKey) => previousKey + 1);
+        }
+        setEventToDelete(null);
+        setMessage("L'événement a été supprimé, mais la liste n'a pas pu être actualisée. Rechargez la page.");
+      } else {
+        setError(requestError.message);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -242,6 +273,8 @@ function AdminEventsPage() {
 
         {isLoading ? (
           <p role="status">Chargement des événements...</p>
+        ) : loadFailed ? (
+          null
         ) : sortedEvents.length === 0 ? (
           <p className="admin-events__empty">Aucun événement pour le moment.</p>
         ) : (

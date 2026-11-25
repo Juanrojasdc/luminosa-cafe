@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const initialFormData = {
   title: "",
@@ -7,6 +7,7 @@ const initialFormData = {
   startTime: "",
   endTime: "",
   image: null,
+  removeImage: false,
 };
 
 function AdminEventForm({
@@ -31,6 +32,7 @@ function AdminEventForm({
   }));
 
   const [imageName, setImageName] = useState("");
+  const imageInputRef = useRef(null);
   const [validationError, setValidationError] = useState("");
 
   const isEditing = event !== null;
@@ -54,9 +56,20 @@ function AdminEventForm({
     setFormData((previousData) => ({
       ...previousData,
       image: file,
+      removeImage: file ? false : previousData.removeImage,
     }));
 
     setImageName(file?.name ?? "");
+  }
+
+  function handleRemoveImage() {
+    setFormData((previousData) => ({
+      ...previousData,
+      image: null,
+      removeImage: true,
+    }));
+    setImageName("");
+    if (imageInputRef.current) imageInputRef.current.value = "";
   }
 
   function handleSubmit(submitEvent) {
@@ -165,6 +178,7 @@ function AdminEventForm({
 
             <input
               id="event-image"
+              ref={imageInputRef}
               name="image"
               type="file"
               accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
@@ -177,9 +191,17 @@ function AdminEventForm({
               </p>
             )}
 
+            {isEditing && event.image && !formData.removeImage && (
+              <button type="button" onClick={handleRemoveImage}>
+                Retirer l’image
+              </button>
+            )}
+
+            {formData.removeImage && <p>L’image sera retirée après enregistrement.</p>}
+
             <p className="admin-event-form__hint">
               JPG, PNG ou WebP — facultatif.
-              {isEditing && " Laissez vide pour conserver l'image actuelle."}
+              {isEditing && !formData.removeImage && " Laissez vide pour conserver l'image actuelle."}
             </p>
           </div>
         </div>

@@ -29,8 +29,19 @@ final class AdminCategoryController extends AbstractController
             return $this->json(['message' => $error], 422);
         }
 
-        $entityManager->persist($category);
-        $entityManager->flush();
+        $position = $category->getDisplayOrder();
+
+        $entityManager->wrapInTransaction(function () use (
+            $entityManager,
+            $repository,
+            $category,
+            $position
+        ): void {
+            $entityManager->persist($category);
+            $entityManager->flush();
+
+            $this->reorderCategories($repository, $entityManager, $category, $position);
+        });
 
         return $this->json([
             'id' => $category->getId(),
@@ -57,7 +68,18 @@ final class AdminCategoryController extends AbstractController
             return $this->json(['message' => $error], 422);
         }
 
-        $entityManager->flush();
+        $position = $category->getDisplayOrder();
+
+        $entityManager->wrapInTransaction(function () use (
+            $entityManager,
+            $repository,
+            $category,
+            $position
+        ): void {
+            $entityManager->flush();
+
+            $this->reorderCategories($repository, $entityManager, $category, $position);
+        });
 
         return $this->json([
             'id' => $category->getId(),
@@ -86,14 +108,60 @@ final class AdminCategoryController extends AbstractController
         ], 409);
     }
 
-    $entityManager->remove($category);
-    $entityManager->flush();
+    $entityManager->wrapInTransaction(function () use (
+        $entityManager,
+        $repository,
+        $category
+    ): void {
+        $entityManager->remove($category);
+        $entityManager->flush();
+
+        $this->reorderCategories($repository, $entityManager);
+    });
 
     return $this->json([
         'message' => 'Category deleted successfully',
     ]);
         }
 
+
+    /**
+     * Reorganiza las categorías en posiciones consecutivas desde 1.
+     * La posición 0 coloca la categoría al final.
+     */
+    private function reorderCategories(
+        CategoryRepository $repository,
+        EntityManagerInterface $entityManager,
+        ?Category $movingCategory = null,
+        int $position = 0
+    ): void {
+        $orderedCategories = $repository->findBy(
+            [],
+            ['displayOrder' => 'ASC', 'id' => 'ASC']
+        );
+
+        if ($movingCategory !== null) {
+            $orderedCategories = array_values(
+                array_filter(
+                    $orderedCategories,
+                    fn (Category $category): bool =>
+                        $category->getId() !== $movingCategory->getId()
+                )
+            );
+
+            $index = $position === 0
+                ? count($orderedCategories)
+                : min($position - 1, count($orderedCategories));
+
+            array_splice($orderedCategories, $index, 0, [$movingCategory]);
+        }
+
+        foreach ($orderedCategories as $index => $category) {
+            $category->setDisplayOrder($index + 1);
+        }
+
+        $entityManager->flush();
+    }
 
     private function fillCategory(
         Category $category,

@@ -20,6 +20,7 @@ function AdminProductsPage() {
 
   const [formKey, setFormKey] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -27,6 +28,10 @@ function AdminProductsPage() {
 
   // Adapta la respuesta Symfony al formato del formulario React.
   function normalizeProduct(product) {
+    if (!product?.category || !Array.isArray(product.foodCharacteristics)) {
+      throw new Error("Format des données des produits inattendu.");
+    }
+
     return {
       ...product,
       categoryId: product.category.id,
@@ -38,6 +43,9 @@ function AdminProductsPage() {
 
   async function loadProducts() {
     const data = await apiRequest("/products");
+    if (!Array.isArray(data)) {
+      throw new Error("Format des données des produits inattendu.");
+    }
     setProducts(data.map(normalizeProduct));
   }
 
@@ -53,6 +61,14 @@ function AdminProductsPage() {
             apiRequest("/food-characteristics"),
           ]);
 
+        if (
+          !Array.isArray(productsData) ||
+          !Array.isArray(categoriesData) ||
+          !Array.isArray(characteristicsData)
+        ) {
+          throw new Error("Format des données administratives inattendu.");
+        }
+
         if (!active) return;
 
         setProducts(productsData.map(normalizeProduct));
@@ -60,6 +76,7 @@ function AdminProductsPage() {
         setFoodCharacteristics(characteristicsData);
       } catch (err) {
         if (active) {
+          setLoadFailed(true);
           setError(err.message);
         }
       } finally {
@@ -116,6 +133,7 @@ function AdminProductsPage() {
     setSaving(true);
     setSaveError("");
     setMessage("");
+    let saved = false;
 
     try {
       let imagePath = null;
@@ -130,6 +148,7 @@ function AdminProductsPage() {
         description: formData.description.trim(),
         price: formData.price,
         image: imagePath,
+        removeImage: formData.removeImage,
         categoryId: formData.categoryId,
         foodCharacteristicIds: formData.foodCharacteristicIds,
         isAvailable: formData.isAvailable,
@@ -148,6 +167,8 @@ function AdminProductsPage() {
         },
       );
 
+      saved = true;
+
       await loadProducts();
 
       setSelectedProduct(null);
@@ -158,7 +179,13 @@ function AdminProductsPage() {
           : "Le produit a été créé avec succès.",
       );
     } catch (err) {
-      setSaveError(err.message);
+      if (saved) {
+        setSelectedProduct(null);
+        setFormKey((key) => key + 1);
+        setMessage("Le produit a été enregistré, mais la liste n'a pas pu être actualisée. Rechargez la page.");
+      } else {
+        setSaveError(err.message);
+      }
     } finally {
       setSaving(false);
     }
@@ -186,11 +213,14 @@ function AdminProductsPage() {
 
     setSaving(true);
     setError("");
+    let deleted = false;
 
     try {
       await adminRequest(`/products/${productToDelete.id}`, {
         method: "DELETE",
       });
+
+      deleted = true;
 
       await loadProducts();
 
@@ -202,7 +232,16 @@ function AdminProductsPage() {
       setProductToDelete(null);
       setMessage("Le produit a été supprimé avec succès.");
     } catch (err) {
-      setError(err.message);
+      if (deleted) {
+        if (selectedProduct?.id === productToDelete.id) {
+          setSelectedProduct(null);
+          setFormKey((key) => key + 1);
+        }
+        setProductToDelete(null);
+        setMessage("Le produit a été supprimé, mais la liste n'a pas pu être actualisée. Rechargez la page.");
+      } else {
+        setError(err.message);
+      }
     } finally {
       setSaving(false);
     }
@@ -283,6 +322,8 @@ function AdminProductsPage() {
 
         {loading ? (
           <p role="status">Chargement des produits...</p>
+        ) : loadFailed ? (
+          null
         ) : products.length === 0 ? (
           <p className="admin-products__empty">Aucun produit pour le moment.</p>
         ) : filteredProducts.length === 0 ? (

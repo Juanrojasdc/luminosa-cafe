@@ -15,12 +15,17 @@ function AdminCategoriesPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   async function loadData() {
     const [categoriesData, productsData] = await Promise.all([
       apiRequest("/categories"),
       apiRequest("/products"),
     ]);
+
+    if (!Array.isArray(categoriesData) || !Array.isArray(productsData)) {
+      throw new Error("Format des données des catégories inattendu.");
+    }
 
     setCategories(categoriesData);
     setProducts(productsData);
@@ -32,12 +37,16 @@ function AdminCategoriesPage() {
     Promise.all([apiRequest("/categories"), apiRequest("/products")])
       .then(([categoriesData, productsData]) => {
         if (!active) return;
+        if (!Array.isArray(categoriesData) || !Array.isArray(productsData)) {
+          throw new Error("Format des données des catégories inattendu.");
+        }
         setCategories(categoriesData);
         setProducts(productsData);
       })
-      .catch(() => {
+      .catch((requestError) => {
         if (active) {
-          setError("Impossible de charger les catégories.");
+          setLoadFailed(true);
+          setError(requestError.message || "Impossible de charger les catégories.");
         }
       })
       .finally(() => {
@@ -69,11 +78,6 @@ function AdminCategoriesPage() {
     setMessage("");
     setError("");
 
-    if (formData.image instanceof File) {
-      setError("L'envoi d'images n'est pas encore disponible.");
-      return;
-    }
-
     const categoryData = {
       name: formData.name,
       description: formData.description,
@@ -82,6 +86,7 @@ function AdminCategoriesPage() {
     };
 
     const isEditing = selectedCategory !== null;
+    let saved = false;
 
     try {
       await adminRequest(
@@ -92,6 +97,8 @@ function AdminCategoriesPage() {
           body: JSON.stringify(categoryData),
         },
       );
+
+      saved = true;
 
       await loadData();
 
@@ -104,7 +111,13 @@ function AdminCategoriesPage() {
           : "La catégorie a été ajoutée.",
       );
     } catch (requestError) {
-      setError(requestError.message);
+      if (saved) {
+        setSelectedCategory(null);
+        setFormKey((key) => key + 1);
+        setMessage("La catégorie a été enregistrée, mais la liste n'a pas pu être actualisée. Rechargez la page.");
+      } else {
+        setError(requestError.message);
+      }
     }
   }
 
@@ -129,11 +142,14 @@ function AdminCategoriesPage() {
 
     setMessage("");
     setError("");
+    let deleted = false;
 
     try {
       await adminRequest(`/categories/${categoryToDelete.id}`, {
         method: "DELETE",
       });
+
+      deleted = true;
 
       await loadData();
 
@@ -147,11 +163,19 @@ function AdminCategoriesPage() {
     } catch (requestError) {
       setCategoryToDelete(null);
 
-      setError(
-        requestError.status === 409
-          ? "Impossible de supprimer cette catégorie : des produits y sont associés."
-          : requestError.message,
-      );
+      if (deleted) {
+        if (selectedCategory?.id === categoryToDelete.id) {
+          setSelectedCategory(null);
+          setFormKey((key) => key + 1);
+        }
+        setMessage("La catégorie a été supprimée, mais la liste n'a pas pu être actualisée. Rechargez la page.");
+      } else {
+        setError(
+          requestError.status === 409
+            ? "Impossible de supprimer cette catégorie : des produits y sont associés."
+            : requestError.message,
+        );
+      }
     }
   }
 
@@ -207,6 +231,8 @@ function AdminCategoriesPage() {
 
         {isLoading ? (
           <p role="status">Chargement des catégories...</p>
+        ) : loadFailed ? (
+          null
         ) : sortedCategories.length === 0 ? (
           <p className="admin-categories__empty">
             Aucune catégorie pour le moment.

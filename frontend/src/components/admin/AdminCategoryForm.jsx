@@ -4,7 +4,6 @@ const initialFormData = {
   name: "",
   description: "",
   displayOrder: 0,
-  image: null,
 };
 
 function AdminCategoryForm({ category = null, onSubmit, onCancel }) {
@@ -19,8 +18,6 @@ function AdminCategoryForm({ category = null, onSubmit, onCancel }) {
       : {}),
   }));
 
-  const [imageName, setImageName] = useState("");
-
   const isEditing = category !== null;
 
   function handleChange(event) {
@@ -30,17 +27,6 @@ function AdminCategoryForm({ category = null, onSubmit, onCancel }) {
       ...previousData,
       [name]: value,
     }));
-  }
-
-  function handleImageChange(event) {
-    const file = event.target.files?.[0] ?? null;
-
-    setFormData((previousData) => ({
-      ...previousData,
-      image: file,
-    }));
-
-    setImageName(file?.name ?? "");
   }
 
   function handleSubmit(event) {
@@ -109,28 +95,6 @@ function AdminCategoryForm({ category = null, onSubmit, onCancel }) {
             />
           </div>
 
-          <div className="admin-category-form__field admin-category-form__field--full">
-            <label htmlFor="category-image">Image</label>
-
-            <input
-              id="category-image"
-              name="image"
-              type="file"
-              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-              onChange={handleImageChange}
-            />
-
-            {imageName && (
-              <p className="admin-category-form__image-name">
-                Fichier sélectionné : {imageName}
-              </p>
-            )}
-
-            <p className="admin-category-form__hint">
-              JPG, PNG ou WebP — facultatif.
-              {isEditing && " Laissez vide pour conserver l'image actuelle."}
-            </p>
-          </div>
         </div>
 
         <div className="admin-category-form__actions">

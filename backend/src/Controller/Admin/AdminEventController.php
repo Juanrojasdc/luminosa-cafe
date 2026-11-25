@@ -134,7 +134,17 @@ final class AdminEventController extends AbstractController
             return 'End time must be later than start time';
         }
 
-        if (array_key_exists('image', $data) && $data['image'] !== null) {
+        if (isset($data['removeImage']) && !is_bool($data['removeImage'])) {
+            return 'Invalid image option';
+        }
+
+        if (($data['removeImage'] ?? false) === true) {
+            if (($data['image'] ?? null) !== null) {
+                return 'Invalid image option';
+            }
+
+            $event->setImage(null);
+        } elseif (array_key_exists('image', $data) && $data['image'] !== null) {
             if (
                 !is_string($data['image'])
                 || !$imageUploader->isValidPath($data['image'])

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const initialFormData = {
   name: "",
@@ -10,6 +10,7 @@ const initialFormData = {
   isFeatured: false,
   displayOrder: 0,
   image: null,
+  removeImage: false,
 };
 
 function AdminProductForm({
@@ -39,6 +40,7 @@ function AdminProductForm({
   }));
 
   const [imageName, setImageName] = useState("");
+  const imageInputRef = useRef(null);
 
   const isEditing = product !== null;
 
@@ -88,9 +90,20 @@ function AdminProductForm({
     setFormData((previousData) => ({
       ...previousData,
       image: file,
+      removeImage: file ? false : previousData.removeImage,
     }));
 
     setImageName(file?.name ?? "");
+  }
+
+  function handleRemoveImage() {
+    setFormData((previousData) => ({
+      ...previousData,
+      image: null,
+      removeImage: true,
+    }));
+    setImageName("");
+    if (imageInputRef.current) imageInputRef.current.value = "";
   }
 
   function handleSubmit(event) {
@@ -251,16 +264,6 @@ function AdminProductForm({
                 </select>
               </div>
 
-              <label className="admin-product-form__checkbox">
-                <input
-                  type="checkbox"
-                  name="isFeatured"
-                  checked={formData.isFeatured}
-                  onChange={handleChange}
-                />
-
-                <span>Mettre en avant</span>
-              </label>
             </div>
           </fieldset>
 
@@ -269,6 +272,7 @@ function AdminProductForm({
 
             <input
               id="product-image"
+              ref={imageInputRef}
               name="image"
               type="file"
               accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
@@ -281,9 +285,17 @@ function AdminProductForm({
               </p>
             )}
 
+            {isEditing && product.image && !formData.removeImage && (
+              <button type="button" onClick={handleRemoveImage}>
+                Retirer l’image
+              </button>
+            )}
+
+            {formData.removeImage && <p>L’image sera retirée après enregistrement.</p>}
+
             <p className="admin-product-form__hint">
               JPG, PNG ou WebP — facultatif.
-              {isEditing && " Laissez vide pour conserver l'image actuelle."}
+              {isEditing && !formData.removeImage && " Laissez vide pour conserver l'image actuelle."}
             </p>
           </div>
         </div>
