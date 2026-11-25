@@ -19,17 +19,26 @@
 }
 
 .footer__identity {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
   align-items: center;
-  gap: 0.75rem;
+  column-gap: 0.75rem;
+  row-gap: 0;
   margin: 0;
   white-space: nowrap;
 }
 
 .footer__logo {
-  font-family: vars.$font-body;
-  font-size: 1rem;
-  font-weight: vars.$font-weight-bold;
+  display: block;
+  grid-column: 1 / -1;
+  justify-self: center;
+  flex-shrink: 0;
+  width: 10rem;
+  height: 3.5rem;
+  background-color: vars.$color-cream;
+  -webkit-mask: url("../../assets/icon/logo.webp") center / contain no-repeat;
+  mask: url("../../assets/icon/logo.webp") center / contain no-repeat;
 }
 
 .footer__signature {
@@ -205,11 +214,13 @@
   }
 
   .footer__identity {
+    display: flex;
     gap: 0.5rem;
   }
 
   .footer__logo {
-    font-size: 0.875rem;
+    width: 9rem;
+    height: 3rem;
   }
 
   .footer__signature {

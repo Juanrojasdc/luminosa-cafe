@@ -16,12 +16,29 @@
 }
 
 .header__logo {
-  color: vars.$color-brown;
-  font-family: vars.$font-body;
-  font-size: vars.$font-size-nav-mobile;
-  font-weight: vars.$font-weight-bold;
-  letter-spacing: 0.12em;
+  display: flex;
+  align-items: center;
   text-decoration: none;
+}
+
+.header__logo-image {
+  display: block;
+  width: 10rem;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+@media (hover: hover) {
+  .header__logo:hover .header__logo-image {
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header__logo-image {
+    transition: none;
+  }
 }
 
 // Mobile navigation
@@ -47,7 +64,22 @@
 
 .header__nav a {
   color: vars.$color-brown;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: vars.$color-cream;
+  text-underline-offset: 0.25rem;
+  transition: text-decoration-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .header__nav a:hover {
+    text-decoration-color: vars.$color-gold;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header__nav a {
+    transition: none;
+  }
 }
 
 // Burger button
@@ -106,6 +138,7 @@
   }
 
   .header__nav a {
+    position: relative;
     color: vars.$color-brown;
     font-family: vars.$font-body;
     font-size: vars.$font-size-nav-desktop;
@@ -117,7 +150,7 @@
     position: relative;
   }
 
-  .header__nav-link--active::after {
+  .header__nav a::after {
     content: "";
     position: absolute;
     right: 0;
@@ -125,6 +158,24 @@
     left: 0;
     height: 1px;
     background-color: vars.$color-gold;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .header__nav a.header__nav-link--active::after {
+    transform: scaleX(1);
+  }
+
+  @media (hover: hover) {
+    .header__nav a:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header__nav a::after {
+      transition: none;
+    }
   }
 
   .header__menu-button {

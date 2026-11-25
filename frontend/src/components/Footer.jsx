@@ -5,7 +5,7 @@ function Footer() {
         {/* Identidad de Luminosa */}
         <div className="footer__brand">
           <p className="footer__identity">
-            <span className="footer__logo">LUMINOSA</span>
+            <span className="footer__logo" role="img" aria-label="Luminosa" />
 
             <span className="footer__signature">you are luminous</span>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import logo from "../assets/icon/logo.webp";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,7 +27,11 @@ function Header() {
     <header className="header">
       <div className="header__inner">
         <Link className="header__logo" to="/" onClick={closeMenu}>
-          LUMINOSA
+          <img
+            className="header__logo-image"
+            src={logo}
+            alt="Luminosa – Accueil"
+          />
         </Link>
 
         <nav
