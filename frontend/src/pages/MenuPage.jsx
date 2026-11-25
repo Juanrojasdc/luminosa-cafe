@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import CategoryNavigation from "../components/menu/CategoryNavigation";
 import ProductCard from "../components/menu/ProductCard";
+import useScrollReveal from "../useScrollReveal.js";
 
 function MenuPage() {
   const [categories, setCategories] = useState([]);
@@ -8,6 +9,7 @@ function MenuPage() {
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const pageRef = useScrollReveal(!isLoading && !error);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -73,7 +75,7 @@ function MenuPage() {
     );
 
   return (
-    <main className="menu-page">
+    <main className="menu-page" ref={pageRef}>
       <section className="menu-page__catalog">
         <header className="menu-page__header">
           <p className="menu-page__eyebrow">MENU</p>
@@ -106,7 +108,9 @@ function MenuPage() {
                 className="menu-page__category"
                 aria-labelledby="active-category-title"
               >
-                <h2 id="active-category-title">{activeCategory.name}</h2>
+                <h2 id="active-category-title" data-scroll-reveal>
+                  {activeCategory.name}
+                </h2>
 
                 {visibleProducts.length > 0 ? (
                   <div className="menu-page__products">

@@ -20,10 +20,10 @@ function App() {
 
   useEffect(() => {
     const titles = {
-      "/": "Luminosa — Cafétéria à Bordeaux",
-      "/menu": "La carte | Luminosa",
-      "/events": "Événements | Luminosa",
-      "/contact": "Contact | Luminosa",
+      "/": "Luminosa Café",
+      "/menu": "Luminosa Café | La carte",
+      "/events": "Luminosa Café | Événements",
+      "/contact": "Luminosa Café | Contact",
     };
 
     document.title = titles[pathname] ?? "Luminosa";

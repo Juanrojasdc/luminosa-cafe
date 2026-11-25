@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import homeInterior from "../assets/img/home-interior.webp";
 import homeSign from "../assets/img/home-sign.webp";
+import useScrollReveal from "../useScrollReveal.js";
 
 function HomePage() {
+  const pageRef = useScrollReveal();
+
   return (
-    <main>
+    <main ref={pageRef}>
       <section className="home-hero">
         <div className="home-hero__content">
           <h1>Bienvenue chez Luminosa</h1>
@@ -45,7 +48,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="home-about">
+      <section className="home-about" data-scroll-reveal>
         <div className="home-about__content">
           <h2>À PROPOS</h2>
 

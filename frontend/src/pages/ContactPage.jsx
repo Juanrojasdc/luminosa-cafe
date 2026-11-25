@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { sendContactMessage } from "../services/api";
+import useScrollReveal from "../useScrollReveal.js";
 
 function ContactPage() {
+  const pageRef = useScrollReveal();
   // Estados del formulario.
   const [status, setStatus] = useState("idle");
   const [feedback, setFeedback] = useState("");
@@ -46,7 +48,7 @@ function ContactPage() {
   }
 
   return (
-    <main className="contact-page">
+    <main className="contact-page" ref={pageRef}>
       <div className="contact-page__container">
         <section className="contact-page__information">
           <p className="contact-page__eyebrow">CONTACT</p>
@@ -70,6 +72,7 @@ function ContactPage() {
 
         <section
           className="contact-page__form-section"
+          data-scroll-reveal
           aria-label="Formulaire de contact"
         >
           <form className="contact-form" onSubmit={handleSubmit}>

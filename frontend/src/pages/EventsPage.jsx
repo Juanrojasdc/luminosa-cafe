@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import EventCard from "../components/events/EventCard";
+import useScrollReveal from "../useScrollReveal.js";
 
 function EventsPage() {
   // Guardamos los eventos recibidos desde Symfony.
@@ -8,6 +9,7 @@ function EventsPage() {
   // Estados para informar al usuario durante la petición.
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const pageRef = useScrollReveal(!isLoading && !error);
 
   // useEffect ejecuta la petición cuando se monta la página.
   useEffect(() => {
@@ -89,7 +91,7 @@ function EventsPage() {
     });
 
   return (
-    <main className="events-page">
+    <main className="events-page" ref={pageRef}>
       <div className="events-page__container">
         <header className="events-page__header">
           <p className="events-page__eyebrow">AGENDA</p>
@@ -125,7 +127,9 @@ function EventsPage() {
               className="events-page__section events-page__section--past"
               aria-labelledby="past-events-title"
             >
-              <h2 id="past-events-title">Événements passés</h2>
+              <h2 id="past-events-title" data-scroll-reveal>
+                Événements passés
+              </h2>
 
               {pastEvents.length > 0 ? (
                 <div className="events-page__list">
