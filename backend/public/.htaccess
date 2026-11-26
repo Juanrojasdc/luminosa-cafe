@@ -1,0 +1,21 @@
+DirectoryIndex index.html
+
+RewriteEngine On
+
+# Only application-managed image filenames may be served from uploads.
+RewriteRule ^uploads/?$ - [F]
+RewriteRule ^uploads/(?![a-f0-9]{32}\.(?:jpg|png|webp)$) - [F]
+
+# Symfony handles every API route, including unknown ones.
+RewriteRule ^api(?:/|$) index.php [END]
+
+# Serve React at the root and existing public files directly.
+RewriteRule ^$ index.html [END]
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [END]
+
+# Missing assets and uploads must not receive the React page.
+RewriteRule ^(?:assets|uploads)(?:/|$) - [R=404,L]
+
+# React Router handles the remaining public and admin URLs.
+RewriteRule ^ index.html [END]
