@@ -1,288 +1,133 @@
-# Luminosa Café
+# Luminosa — With Love, Rachel
 
-Application web développée pour **Luminosa – With Love, Rachel**, une cafétéria située à Bordeaux, dans le cadre de la préparation au titre professionnel **Développeur Web et Web Mobile (DWWM)**.
+J'ai développé Luminosa pour un café situé à Bordeaux, dans le cadre de ma formation de Développeur Web et Web Mobile. Le site permet de découvrir le café, sa carte et ses événements, puis de contacter l'établissement. La propriétaire peut gérer les contenus depuis un espace d'administration, sans modifier le code.
 
-Le projet vise à présenter l'établissement, sa carte et ses événements, tout en proposant à terme un espace d'administration permettant à la propriétaire de gérer les contenus du site de manière autonome.
+Le site est accessible sur [luminosa-cafe.fr](https://luminosa-cafe.fr).
 
-## Présentation du projet
+## Fonctionnalités
 
-L'application est organisée autour de deux espaces :
+Les visiteurs peuvent consulter la carte par catégorie, les prix, la disponibilité, les caractéristiques alimentaires et les événements. Le formulaire de contact transmet les messages par Resend.
 
-**Un espace public**, permettant aux visiteurs de :
+La propriétaire peut se connecter pour créer, modifier et supprimer des catégories, produits et événements, changer leur ordre et gérer leurs images. Ces données sont enregistrées dans MySQL. Les commandes, paiements et comptes clients ne font pas partie du périmètre du site.
 
-- Découvrir la cafétéria.
-- Consulter la carte des produits.
-- Consulter les événements.
-- Accéder à un formulaire de contact.
+## Technologies et architecture
 
-**Un espace d'administration**, destiné à permettre à la propriétaire de :
+Le dossier `frontend/` contient React 19, React Router 7, JavaScript/JSX, Vite 8, Sass, Bootstrap 5 et Bootstrap Icons. Le dossier `backend/` contient Symfony 7.4, Doctrine ORM et Migrations. Le navigateur utilise `fetch()` et des URL relatives pour appeler l'API Symfony, qui accède à MySQL. Le contact utilise Resend.
 
-- Se connecter de manière sécurisée.
-- Gérer les catégories de produits.
-- Ajouter, modifier et supprimer des produits.
-- Gérer les événements.
+En développement, Vite transmet `/api` et `/uploads` au serveur Symfony local grâce au [proxy](frontend/vite.config.js). Sur OVHcloud, Apache sert React compilé et les fichiers publics; Symfony répond aux appels `/api`. Les fichiers privés Symfony restent hors de la racine web.
 
-Les interfaces d'administration existent actuellement sous forme de démonstration côté React. Leur connexion à une authentification réelle et à des opérations persistantes reste à développer.
+L'API publique propose `GET /api/categories`, `GET /api/products`, `GET /api/food-characteristics`, `GET /api/events` et `GET /api/health`. Les pages React utilisent ces réponses JSON. Les opérations administratives sont protégées par une session, le rôle `ROLE_ADMIN` et un jeton CSRF pour les écritures.
 
-## Stack technique
+## Prérequis
 
-### Front-End
+| Outil | Utilisation | Vérification |
+|---|---|---|
+| PHP 8.4 recommandé | Exécuter Symfony | `php -v` |
+| Composer | Installer les dépendances PHP | `composer --version` |
+| Node.js 24 recommandé et npm | Installer et compiler React | `node -v`, `npm -v` |
+| MySQL | Conserver les données | Vérifier le service et ouvrir phpMyAdmin |
+| Symfony CLI | Démarrer le serveur avec les commandes ci-dessous | `symfony -V` |
 
-- **React 19** — Bibliothèque de construction des interfaces.
-- **Vite 8** — Environnement de développement et outil de build.
-- **React Router 7** — Navigation entre les pages.
-- **Bootstrap 5** — Composants et mise en page responsive.
-- **Sass (SCSS)** — Organisation des styles.
-- **JavaScript / JSX** — Développement des composants.
-- **Fetch API** — Communication HTTP avec le Back-End.
+Le projet déclare PHP `>=8.2` dans [composer.json](backend/composer.json), mais il faut aussi respecter les exigences des dépendances installées. Les versions bloquées de Vite et ESLint demandent ensemble Node `^20.19.0 || ^22.13.0 || >=24`. La préparation précédente a utilisé PHP 8.4.27 et Node 24.22.1. Les versions précises des bibliothèques sont dans `composer.lock` et `package-lock.json`; `composer check-platform-reqs` permet de vérifier PHP et ses extensions sur la machine cible.
 
-### Back-End
+Sur Windows, [WampServer](https://www.wampserver.com/) peut fournir PHP, MySQL et phpMyAdmin. Il n'est pas obligatoire si ces outils sont déjà disponibles. Installer Composer depuis [getcomposer.org](https://getcomposer.org/), Node.js depuis [nodejs.org](https://nodejs.org/) et, pour les commandes ci-dessous, Symfony CLI depuis [symfony.com/download](https://symfony.com/download).
 
-- **PHP 8.4**
-- **Symfony 7.4 LTS** — Framework Back-End.
-- **Doctrine ORM** — Gestion des entités et accès aux données.
-- **Doctrine Migrations** — Évolution du schéma de la base.
-- **API REST** — Exposition des données au format JSON.
+## Installation locale
 
-### Base de données et outils
-
-- **MySQL 8.3** — Base de données relationnelle.
-- **WampServer** — Environnement local.
-- **Git / GitHub** — Versionnement et suivi du développement.
-
-## Architecture de l'application
-
-Le projet repose sur une séparation entre le Front-End React et le Back-End Symfony.
+Télécharger le dépôt depuis [GitHub](https://github.com/Juanrojasdc/luminosa-cafe) :
 
 ```text
-                Navigateur
-                    |
-                    v
-              React + Vite
-                    |
-              HTTP / Fetch
-                    |
-                    v
-             API REST Symfony
-                    |
-                Doctrine ORM
-                    |
-                    v
-                  MySQL
+git clone https://github.com/Juanrojasdc/luminosa-cafe.git
+cd luminosa-cafe
 ```
 
-En développement, un proxy Vite redirige les requêtes `/api` vers le serveur Symfony local.
+Une archive ZIP du dépôt peut aussi être téléchargée puis extraite. Ouvrir un terminal dans le dossier qui contient `frontend/`, `backend/` et `docs/`.
 
-Les pages **Carte** et **Événements** consomment désormais les données provenant de l'API, plutôt que de dépendre uniquement de données statiques.
+### Configurer le back-end
 
-## Fonctionnalités développées
+Avant `composer install`, créer `backend/.env.local`. Ce fichier, propre à chaque machine, est ignoré par Git. Le générer avec les valeurs **fictives** suivantes, puis les remplacer selon votre environnement :
 
-### Interface publique
-
-- Page d'accueil.
-- Page Carte avec affichage des produits et des catégories.
-- Page Événements.
-- Page Contact avec formulaire côté interface.
-- Page 404.
-- Navigation entre les pages.
-- Mise en page responsive.
-- Composants React réutilisables.
-- Gestion des états de chargement, d'erreur et de liste vide sur les pages connectées à l'API.
-
-### Back-End et données
-
-- Initialisation du projet Symfony.
-- Configuration de la connexion MySQL.
-- Création des entités Doctrine.
-- Création et utilisation de migrations.
-- Mise en place d'une API REST publique en lecture.
-- Intégration de l'API avec les pages Carte et Événements.
-
-### Administration
-
-Les interfaces suivantes ont été développées côté React :
-
-- Connexion administrative de démonstration.
-- Gestion des produits.
-- Gestion des catégories.
-- Gestion des événements.
-
-**Important :** ces interfaces utilisent encore des données et des interactions locales simulées. Elles ne disposent pas encore d'une authentification serveur opérationnelle ni d'un CRUD persistant.
-
-## API REST
-
-Les endpoints publics actuellement disponibles sont :
-
-| Méthode | Endpoint                    | Description                                    |
-| ------- | --------------------------- | ---------------------------------------------- |
-| `GET`   | `/api/categories`           | Récupération des catégories                    |
-| `GET`   | `/api/products`             | Récupération des produits                      |
-| `GET`   | `/api/food-characteristics` | Récupération des caractéristiques alimentaires |
-| `GET`   | `/api/events`               | Récupération des événements                    |
-| `GET`   | `/api/health`               | Vérification de la disponibilité de l'API      |
-
-Les données sont retournées au format JSON.
-
-Certaines réponses sont adaptées côté React pour correspondre aux besoins des composants, notamment pour les prix, les catégories et les dates des événements.
-
-## Base de données
-
-La base de données locale s'appelle `luminosa_db`.
-
-Les principales entités Doctrine sont :
-
-- `Category`
-- `Product`
-- `FoodCharacteristic`
-- `Event`
-- `Admin`
-
-Une table de liaison permet d'associer les produits à leurs caractéristiques alimentaires.
-
-Les données actuellement utilisées pour les vérifications techniques ne constituent pas nécessairement le contenu définitif de la cafétéria.
-
-## Installation et lancement en local
-
-### Prérequis
-
-- Node.js et npm.
-- PHP compatible avec Symfony 7.4.
-- Composer.
-- MySQL.
-- Symfony CLI, pour les commandes présentées ci-dessous.
-
-Une configuration locale de la base de données est également nécessaire.
-
-### 1. Récupérer le projet
-
-```bash
-git clone <URL_DU_DEPOT>
-cd <DOSSIER_DU_PROJET>
+```dotenv
+APP_ENV=dev
+APP_DEBUG=1
+APP_SECRET=REMPLACER_PAR_UN_SECRET_LOCAL
+DATABASE_URL="mysql://UTILISATEUR_LOCAL:MOT_DE_PASSE_LOCAL@127.0.0.1:3306/luminosa_local?serverVersion=VERSION_MYSQL_LOCALE&charset=utf8mb4"
+DEFAULT_URI=http://127.0.0.1:8000
+RESEND_API_KEY=REMPLACER_PAR_UNE_CLE_PERSONNELLE_SI_NECESSAIRE
+CONTACT_FROM_EMAIL=expediteur@example.test
+CONTACT_TO_EMAIL=destinataire@example.test
 ```
 
-Remplacer les valeurs entre chevrons par l'URL et le dossier réels du dépôt.
+Pour créer un secret local, exécuter `php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"` et copier le résultat dans `APP_SECRET`. Choisir le serveur, le port, la base, l'utilisateur et la version MySQL réels pour `DATABASE_URL`. Les caractères spéciaux du mot de passe MySQL doivent être encodés dans cette URL. `DEFAULT_URI` donne à Symfony son adresse locale par défaut.
 
-### 2. Installer et démarrer le Back-End
+Les valeurs de contact fictives permettent de configurer l'application, mais **pas d'envoyer un message**. Un envoi réel exige une clé Resend personnelle autorisée, un domaine expéditeur vérifié et un destinataire adapté. Ne pas employer les accès de la propriétaire pour une installation locale.
 
-```bash
+### Installer les dépendances
+
+Depuis la racine du dépôt, ouvrir un terminal dans chaque dossier :
+
+```text
 cd backend
 composer install
 ```
 
-Configurer la variable d'environnement `DATABASE_URL` pour accéder à une base MySQL locale.
+```text
+cd frontend
+npm ci
+```
 
-Créer la base si nécessaire :
+Ces commandes respectent `composer.lock` et `package-lock.json`. Les auto-scripts de Composer démarrent Symfony; c'est pourquoi `.env.local` doit être préparé avant son installation.
 
-```bash
+### Créer la base et les données de référence
+
+Vérifier que MySQL est démarré. Avec WampServer, ouvrir phpMyAdmin depuis son interface et confirmer le serveur, le port et l'utilisateur utilisés. Revenir dans `backend/`, avec `DATABASE_URL` dirigée vers une **base nouvelle** :
+
+```text
 php bin/console doctrine:database:create
-```
-
-Exécuter les migrations :
-
-```bash
 php bin/console doctrine:migrations:migrate
+php bin/console doctrine:schema:validate
 ```
 
-Démarrer Symfony :
+La première commande crée la base; la deuxième applique la migration qui crée les tables; la troisième compare le schéma et les entités. Dans phpMyAdmin, sélectionner cette nouvelle base et vérifier que les tables `admin`, `category`, `product`, `event` et `food_characteristic` existent.
 
-```bash
-symfony server:start
+Importer ensuite [backend/data/food_characteristics.sql](backend/data/food_characteristics.sql) : dans phpMyAdmin, sélectionner la base, ouvrir **Importer**, choisir le fichier et lancer l'importation. La table `food_characteristic` doit contenir huit noms, dont « Antioxydant ». Le script peut être relancé séquentiellement sans ajouter ces noms une seconde fois. Il ne crée ni catalogue ni administrateur. Au départ, le catalogue est vide; ses contenus peuvent être créés dans l'administration.
+
+### Créer le premier administrateur
+
+Aucun compte ni mot de passe par défaut n'est fourni. Depuis `backend/`, lancer :
+
+```text
+php bin/console security:hash-password
 ```
 
-Le serveur Back-End est utilisé en développement sur :
+Choisir `App\Entity\Admin` si la commande demande une classe, puis saisir un mot de passe choisi pour cette installation à l'invite. Ne pas le placer dans la commande. Copier le **hash obtenu**, pas le mot de passe, dans phpMyAdmin : sélectionner la nouvelle base, ouvrir la table `admin`, puis **Insérer**. Renseigner `first_name`, `last_name`, `email` et `password` (avec le hash). Laisser `id_admin` à sa valeur auto-incrémentée. Utiliser ensuite cet email et le mot de passe choisi sur `/admin/login`.
 
-`http://127.0.0.1:8000`
+### Démarrer et vérifier
 
-### 3. Installer et démarrer le Front-End
+Ouvrir deux terminaux depuis la racine du dépôt :
 
-Dans un autre terminal, depuis le dossier `frontend` :
+```text
+# Terminal 1
+cd backend
+symfony server:start --port=8000
+```
 
-```bash
-npm install
+```text
+# Terminal 2
+cd frontend
 npm run dev
 ```
 
-L'application React est accessible en développement sur :
+Ouvrir `http://localhost:5173`. Vérifier `/api/health` via le navigateur ou le proxy Vite, puis la carte et `/admin/login`. Une réponse correcte de health ne prouve pas à elle seule que la base fonctionne : vérifier aussi les huit caractéristiques et une connexion avec le compte local. Si l'API est inaccessible, vérifier le serveur Symfony et le proxy; si les tables manquent, vérifier `DATABASE_URL` et les migrations.
 
-`http://localhost:5173`
+Pour contrôler le frontend, exécuter `npm run lint` et `npm run build` depuis `frontend/`. Pour le backend, `php bin/console lint:container` et `php bin/console doctrine:schema:validate` se lancent depuis `backend/`, avec la configuration locale correcte.
 
-Le proxy Vite permet au Front-End d'accéder aux endpoints Symfony via `/api`.
+## Sécurité et déploiement
 
-### 4. Vérifications Front-End
+L'administration utilise des sessions Symfony, des mots de passe hashés, `ROLE_ADMIN`, un jeton CSRF pour les écritures et des validations côté serveur. Les clés, mots de passe, sauvegardes et fichiers `.env.local` ou `.env.prod.local` restent hors du dépôt. Garder également la configuration de production hors de la racine publique.
 
-```bash
-npm run lint
-npm run build
-```
+La [procédure de déploiement OVH](docs/deploiement-ovh.md) décrit la préparation du paquet et les adaptations propres à `www/`. Le dépôt contient le code source; les données MySQL et les images administrées appartiennent à chaque installation.
 
-Ces commandes permettent de vérifier respectivement les règles de lint et la compilation du Front-End.
+## Site public
 
-**Remarque :** cette procédure décrit l'environnement local connu du projet. Elle devra être vérifiée sur une installation propre avant d'être considérée comme un guide d'installation définitif.
-
-## État d'avancement
-
-**Dernière mise à jour documentaire : 12 novembre 2026.**
-
-| Domaine                                     | État                                           |
-| ------------------------------------------- | ---------------------------------------------- |
-| Conception fonctionnelle                    | Réalisée, avec validations métier à consolider |
-| Interfaces publiques React                  | Développées                                    |
-| Responsive                                  | Travaillé et vérifié manuellement              |
-| Back-End Symfony                            | Opérationnel en local                          |
-| Base MySQL et entités Doctrine              | Créées                                         |
-| Migrations                                  | Utilisées                                      |
-| API REST publique en lecture                | Opérationnelle                                 |
-| Intégration React / API pour la Carte       | Réalisée                                       |
-| Intégration React / API pour les Événements | Réalisée                                       |
-| Interfaces administratives                  | Démonstration locale                           |
-| Authentification et autorisations serveur   | À développer                                   |
-| CRUD administratifs persistants             | À développer                                   |
-| Envoi réel du formulaire de contact         | À développer                                   |
-| Téléversement sécurisé des images           | À développer                                   |
-| Tests complets et sécurité                  | À compléter                                    |
-| Déploiement en production                   | À réaliser                                     |
-
-## Prochaines étapes
-
-Les prochaines étapes de développement concernent principalement :
-
-1. Mettre en place l'authentification et les autorisations administratives avec Symfony.
-2. Connecter les interfaces d'administration à des opérations CRUD persistantes.
-3. Ajouter les validations serveur nécessaires.
-4. Gérer les images des produits.
-5. Mettre en place le traitement réel du formulaire de contact.
-6. Compléter les tests fonctionnels, techniques et de sécurité.
-7. Préparer et vérifier le déploiement en production.
-8. Finaliser la documentation et les livrables de certification.
-
-## Périmètre du projet
-
-La première version vise un site vitrine dynamique avec une gestion autonome des contenus.
-
-Les fonctionnalités de commande en ligne, de paiement et de click & collect ne font pas partie du périmètre initial. Elles pourront être étudiées dans une évolution future du projet.
-
-## Contexte de certification
-
-Ce projet est réalisé dans le cadre de la préparation au titre professionnel français **Développeur Web et Web Mobile (DWWM)**.
-
-Il permet de travailler notamment :
-
-- La conception d'interfaces web.
-- Le développement Front-End.
-- Le développement Back-End.
-- La modélisation et l'exploitation d'une base de données relationnelle.
-- La communication entre le client et le serveur.
-- La sécurisation d'une application web.
-- Les tests, la documentation et le déploiement.
-
-Les compétences sont documentées progressivement à partir des réalisations et des preuves disponibles.
-
-## Auteur
-
-Projet développé dans le cadre d'un parcours de formation et de certification **Développeur Web et Web Mobile**.
-
-Application destinée à **Luminosa – With Love, Rachel**, Bordeaux.
-
----
-
-_Projet en cours de développement — dernière actualisation : 12 novembre 2026._
+[https://luminosa-cafe.fr](https://luminosa-cafe.fr)

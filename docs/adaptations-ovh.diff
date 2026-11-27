@@ -1,0 +1,70 @@
+diff --git a/www/index.php b/www/index.php
+--- a/www/index.php
++++ b/www/index.php
+@@ -2,7 +2,7 @@
+ 
+ use App\Kernel;
+ 
+-require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
++require_once dirname(__DIR__).'/luminosa/vendor/autoload_runtime.php';
+ 
+ return static function (array $context) {
+     return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+diff --git a/luminosa/src/Service/ImageUploader.php b/luminosa/src/Service/ImageUploader.php
+--- a/luminosa/src/Service/ImageUploader.php
++++ b/luminosa/src/Service/ImageUploader.php
+@@ -15,7 +15,7 @@ final class ImageUploader
+     ];
+ 
+     public function __construct(
+-        private readonly string $projectDir
++        private readonly string $uploadsDirectory
+     ) {
+     }
+ 
+@@ -53,7 +53,7 @@ final class ImageUploader
+ 
+         $filename = bin2hex(random_bytes(16)) . '.' . $extension;
+ 
+-        $directory = $this->projectDir . '/public/uploads';
++        $directory = $this->uploadsDirectory;
+ 
+         $file->move($directory, $filename);
+ 
+@@ -71,7 +71,7 @@ final class ImageUploader
+     $filename = basename($path);
+ 
+     return is_file(
+-        $this->projectDir . '/public/uploads/' . $filename
++        $this->uploadsDirectory . '/' . $filename
+     );
+ }
+ }
+diff --git a/luminosa/config/services.yaml b/luminosa/config/services.yaml
+--- a/luminosa/config/services.yaml
++++ b/luminosa/config/services.yaml
+@@ -31,4 +31,4 @@ services:
+               }
+     App\Service\ImageUploader:
+         arguments:
+-            $projectDir: "%kernel.project_dir%"
++            $uploadsDirectory: "%kernel.project_dir%/../www/uploads"
+diff --git a/www/.htaccess b/www/.htaccess
+--- a/www/.htaccess
++++ b/www/.htaccess
+@@ -2,6 +2,15 @@ DirectoryIndex index.html
+ 
+ RewriteEngine On
+ 
++# Temporary canonical redirect; 307 preserves request methods.
++RewriteCond %{HTTPS} !=on [OR]
++RewriteCond %{HTTP_HOST} ^www\.luminosa-cafe\.fr$ [NC]
++RewriteRule ^ https://luminosa-cafe.fr%{REQUEST_URI} [R=307,L]
++
++# Reject private paths before the React fallback.
++RewriteRule ^(?:\.env(?:\..*)?|composer\.(?:json|lock)|symfony\.lock)$ - [F]
++RewriteRule ^(?:\.git|bin|config|src|var|vendor)(?:/|$) - [F]
++
+ # Only application-managed image filenames may be served from uploads.
+ RewriteRule ^uploads/?$ - [F]
+ RewriteRule ^uploads/(?![a-f0-9]{32}\.(?:jpg|png|webp)$) - [F]
